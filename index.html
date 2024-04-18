@@ -53,8 +53,8 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI() {
 			});
 			return file_objects;
 		})
-		.then(async function (file_objects) { const file_object = file_objects.at(0); console.log('file_object: ', file_object);
-						     return file_object.src; })
+		.then(async function (file_objects) { console.log('file_objects: ', file_objects);
+						     return file_objects.at(0).src; })
 		//.then(async function (file_download_url) { var text_out = await fetch(file_download_url); return text_out })
 		//.then(response => response.text())
 		//.then(async function(text_out) {  document.getElementById("pdf_text").innerHTML = text_out; return text_out;	})
