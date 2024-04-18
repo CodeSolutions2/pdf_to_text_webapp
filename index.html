@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body>
+
+
+
+<br><br>
+<button id="show_pdf" onclick="show_pdf()">show_pdf</button>
+<br><br>
+
+
+
+	  
+<script>
+
+var iframe = document.createElement('iframe');
+  
+const desired_filename = "document.txt";
+const repoOwner = 'CodeSolutions2';
+const repoName = 'pdf_to_text_webapp';
+
+// ----------------------------------------------------
+
+async function show_pdf() {
+  
+  await GET_text_from_file_wo_auth_GitHub_RESTAPI()
+    .then(async function(file_object_download_url) {
+iframe.src = file_object_download_url; document.body.appendChild(iframe);
+    })
+  
+}
+
+// ----------------------------------------------------
+	
+async function GET_text_from_file_wo_auth_GitHub_RESTAPI() {
+	
+	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
+
+	var file_objects = [];
+	
+	return await fetch(url)
+		.then(res => res.json())
+		.then(data => { 
+			data.forEach(async function(file) {
+				var regexp = new RegExp(`${desired_filename}`, 'g');
+				if (file.type === 'file' && file.name.match(regexp)) {
+					file_objects.push(file);
+				}
+			});
+			return file_objects;
+		})
+		.then(async function (file_objects) { return file_objects.at(0).download_url; })
+		//.then(async function (file_download_url) { var text_out = await fetch(file_download_url); return text_out })
+		//.then(response => response.text())
+		//.then(async function(text_out) {  document.getElementById("pdf_text").innerHTML = text_out; return text_out;	})
+		.catch(error => { console.log(error); });
+}
+
+// ----------------------------------------------------
+  
+</script>
+
+  </body>
+</html>
