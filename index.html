@@ -28,10 +28,10 @@ const repoName = 'pdf_to_text_webapp';
 async function show_pdf() {
   
   await GET_text_from_file_wo_auth_GitHub_RESTAPI()
-    .then(async function(file_object) {
-	    console.log('file_object: ', file_object);
-	    iframeElement.src = file_object.at(0).src; 
-	    document.body.appendChild(iframeElement);
+    .then(async function(file_objects) {
+	    console.log('file_objects: ', file_objects);
+	    // iframeElement.src = file_objects.at(0).src; 
+	    // document.body.appendChild(iframeElement);
     })
   
 }
@@ -41,25 +41,26 @@ async function show_pdf() {
 async function GET_text_from_file_wo_auth_GitHub_RESTAPI() {
 	
 	var url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents`;
+	var file_objects = [];
 	
 	return await fetch(url)
 		.then(res => res.json())
 		.then(data => { 
 			data.forEach(async function(file) {
-				var regexp = new RegExp(`${desired_filename}`, 'g');
-				if (file.type === 'file' && file.name.match(regexp)) {
-					var file_object = file;
+				if (file.type === 'file' && file.name.match(/.(pdf)$/i)) {
+					file_objects.push(file);
 				}
 			});
-			return file_object;
+			console.log('file_objects: ', file_objects);
+			return file_objects;
 		})
-		//.then(async function (file_download_url) { var text_out = await fetch(file_download_url); return text_out })
-		//.then(response => response.text())
-		//.then(async function(text_out) {  document.getElementById("pdf_text").innerHTML = text_out; return text_out;	})
 		.catch(error => { console.log(error); });
+
+	
 }
 
 // ----------------------------------------------------
+
   
 </script>
 
