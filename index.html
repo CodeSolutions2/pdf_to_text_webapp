@@ -91,7 +91,7 @@ async function call_to_model(pdf_blob) {
 		.then(res => res.json())
 		.then(res => { 
 			//const text_out = JSON.parse(JSON.stringify(res))['choices'][0]['message']['content'];
-				  console.log('res: ', res);
+				  console.log('out: ', JSON.parse(JSON.stringify(res))['choices'][0]['message']['content']);
 		})
 		.catch(error => { console.log(error); });
   
