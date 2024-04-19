@@ -10,12 +10,7 @@
 <br><br>
 
 
-<object data="document.pdf" type="application/pdf" width="800" height="1200">
-  <p>
-    You don't have a PDF plugin, but you can
-    <a href="document.pdf">download the PDF file. </a>
-  </p>
-</object>
+<object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object>
 
 	  
 <script>
@@ -23,9 +18,10 @@
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
 // https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
 var objectElement = document.createElement('object');
-objectElement.setAttribute("width", 500);
-objectElement.setAttribute("height", 1000);
 objectElement.setAttribute("type", "application/pdf");
+objectElement.setAttribute("width", 800);
+objectElement.setAttribute("height", 1200);
+
 
 const repoOwner = 'CodeSolutions2';
 const repoName = 'pdf_to_text_webapp';
@@ -39,7 +35,9 @@ async function show_pdf() {
 	    console.log('file_objects: ', file_objects);
 	    // iframeElement.src = file_objects.at(0).html_url; // Firefox Can’t Open This Page in the iframe, displays a button 'open site in new window'. It opens file in new window on github server.
 	    // iframeElement.src = file_objects.at(0).download_url; // iframe is empty, it changes to a new window, and automatically downloads the file to the pc
-	    objectElement.data = file_objects.at(0).html_url;
+	    // objectElement.data = file_objects.at(0).html_url;  // nothing appears
+	    // objectElement.setAttribute("data", file_objects.at(0).html_url);
+	    objectElement.setAttribute("data", file_objects.at(0).download_url);
 	    document.body.appendChild(objectElement);
     })
   
