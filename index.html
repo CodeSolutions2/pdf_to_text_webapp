@@ -15,9 +15,10 @@
 <script>
 
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
-var iframeElement = document.createElement('iframe');
-iframeElement.setAttribute("width", 500);
-iframeElement.setAttribute("height", 1000);
+var objectElement = document.createElement('object');
+objectElement.setAttribute("width", 500);
+objectElement.setAttribute("height", 1000);
+objectElement.setAttribute("type", "application/pdf");
 
 const repoOwner = 'CodeSolutions2';
 const repoName = 'pdf_to_text_webapp';
@@ -29,8 +30,9 @@ async function show_pdf() {
   await GET_text_from_file_wo_auth_GitHub_RESTAPI()
     .then(async function(file_objects) {
 	    console.log('file_objects: ', file_objects);
-	    // iframeElement.src = file_objects.at(0).html_url; // Firefox Can’t Open This Page, open site in new window
-	    iframeElement.src = file_objects.at(0).download_url;
+	    // iframeElement.src = file_objects.at(0).html_url; // Firefox Can’t Open This Page in the iframe, displays a button 'open site in new window'. It opens file in new window on github server.
+	    // iframeElement.src = file_objects.at(0).download_url; // iframe is empty, it changes to a new window, and automatically downloads the file to the pc
+	    objectElement.data = file_objects.at(0).html_url;
 	    document.body.appendChild(iframeElement);
     })
   
