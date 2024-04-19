@@ -8,12 +8,18 @@
 <br><br>
 <button id="show_pdf" onclick="show_pdf()">show_pdf</button>
 <br><br>
+<button id="extract_text_from_pdf" onclick="extract_text_from_pdf()">extract_text_from_pdf</button>
+
+<!-- <object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object> -->
+
+<!-- View text results -->
+<div id="output" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 
 
-<object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object>
 
-	  
 <script>
+
+const outp = document.getElementById('output');
 
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
 // https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
@@ -33,16 +39,59 @@ async function show_pdf() {
   await GET_text_from_file_wo_auth_GitHub_RESTAPI()
     .then(async function(file_objects) {
 	    // console.log('file_objects: ', file_objects);
-	    
+
+	    outp.innerHTML = file_objects.at(0).download_url;
+	
 	    objectElement.setAttribute("data", file_objects.at(0).name);
 	    // one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
 	    document.body.appendChild(objectElement);
-
-	    // 
     })
   
 }
 
+// ----------------------------------------------------
+
+async function extract_text_from_pdf() {
+	
+	var file_download_url = outp.innerHTML;
+	
+	await fetch(file_download_url)
+  				.then(response => response.blob())
+			 	.then(async function(blob_object) { 
+					// console.log("blob_object: ", blob_object);
+					await call_to_model(blob_object);
+				})
+				.then(async function() { await new Promise(r => setTimeout(r, 200)); })
+				.catch(error => { console.log(error); });
+
+}
+	
+
+	
+async function call_to_model(pdf_blob) {
+
+	const prompt = `Extract the text from the given pdf file: ${pdf_blob}`;
+	
+	// ------------------------------------------
+	var system_content = "You are a helpful assistant"
+	var assistant_content = "Respond concisely"
+	var messages = [{"role": "system", "content": system_content}, {"role": "user", "content": prompt}, {"role": "assistant", "content": assistant_content}];
+	var data = {"model": 'gpt-3.5-turbo', 'messages': messages, 'temperature': 0};
+	var url = 'https://api.openai.com/v1/chat/completions'
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY}
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	// ------------------------------------------
+	
+	await fetch(url, options)
+		.then(res => res.json())
+		.then(res => { const text_out = JSON.parse(JSON.stringify(res))['choices'][0]['message']['content'];
+				  console.log('text_out: ', text_out);
+		})
+		.catch(error => { console.log(error); });
+  
+}
+
+	
 // ----------------------------------------------------
 	
 async function GET_text_from_file_wo_auth_GitHub_RESTAPI() {
