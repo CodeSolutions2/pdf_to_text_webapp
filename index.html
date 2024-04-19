@@ -36,8 +36,11 @@ async function show_pdf() {
 	    // iframeElement.src = file_objects.at(0).html_url; // Firefox Can’t Open This Page in the iframe, displays a button 'open site in new window'. It opens file in new window on github server.
 	    // iframeElement.src = file_objects.at(0).download_url; // iframe is empty, it changes to a new window, and automatically downloads the file to the pc
 	    // objectElement.data = file_objects.at(0).html_url;  // nothing appears
-	    // objectElement.setAttribute("data", file_objects.at(0).html_url);
-	    objectElement.setAttribute("data", file_objects.at(0).download_url);
+	    
+	    // objectElement.setAttribute("data", file_objects.at(0).download_url); // The loading of “https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf” in a frame is denied by “X-Frame-Options“ directive set to “deny“.
+
+	    objectElement.setAttribute("data", file_objects.at(0).html_url);
+	    
 	    document.body.appendChild(objectElement);
     })
   
