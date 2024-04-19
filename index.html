@@ -3,8 +3,12 @@
   <head></head>
   <body>
 
-
-
+<h1>An example of extracting text from a pdf</h1> 
+<label id="directions" style="display:block">Enter OpenAI key to extract text from a pdf file.</label>
+<br>
+<!-- ----------------------------------- -->
+<input id="OPENAI_API_KEY" type="text" value="" placeholder="OPENAI_API_KEY" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+<!-- ----------------------------------- -->
 <br><br>
 <button id="show_pdf" onclick="show_pdf()">show_pdf</button>
 <br><br>
@@ -28,7 +32,8 @@ objectElement.setAttribute("type", "application/pdf");
 objectElement.setAttribute("width", 800);
 objectElement.setAttribute("height", 1200);
 
-
+const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
+	
 const repoOwner = 'CodeSolutions2';
 const repoName = 'pdf_to_text_webapp';
 
