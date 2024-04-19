@@ -32,27 +32,13 @@ async function show_pdf() {
   
   await GET_text_from_file_wo_auth_GitHub_RESTAPI()
     .then(async function(file_objects) {
-	    console.log('file_objects: ', file_objects);
-	    // iframeElement.src = file_objects.at(0).html_url; // Firefox Can’t Open This Page in the iframe, displays a button 'open site in new window'. It opens file in new window on github server.
-	    // iframeElement.src = file_objects.at(0).download_url; // iframe is empty, it changes to a new window, and automatically downloads the file to the pc
+	    // console.log('file_objects: ', file_objects);
 	    
-	    // objectElement.data = file_objects.at(0).html_url;
-	    // Some cookies are misusing the recommended “SameSite“ attribute 3
-	    // Cookie “_gh_sess” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”. document.pdf
-	    // Cookie “_octo” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”. document.pdf
-	    // Cookie “logged_in” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.
-	    
-	    // objectElement.setAttribute("data", file_objects.at(0).download_url); // The loading of “https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf” in a frame is denied by “X-Frame-Options“ directive set to “deny“.
-
-	    // objectElement.setAttribute("data", file_objects.at(0).html_url);
-	    // Some cookies are misusing the recommended “SameSite“ attribute 3
-	    // Cookie “_gh_sess” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”. document.pdf
-	    // Cookie “_octo” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”. document.pdf
-	    // Cookie “logged_in” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.
-
-	    objectElement.setAttribute("data", "document.pdf");
-	    
+	    objectElement.setAttribute("data", file_objects.at(0).name);
+	    // one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
 	    document.body.appendChild(objectElement);
+
+	    // 
     })
   
 }
