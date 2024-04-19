@@ -75,10 +75,10 @@ async function extract_text_from_pdf() {
 	
 async function call_to_model(pdf_blob) {
 
-	const prompt = `Extract the text from the given pdf file: ${pdf_blob}`;
+	const prompt = `Extract the text from the given pdf blob file: ${pdf_blob}`;
 	
 	// ------------------------------------------
-	var system_content = "You are a helpful assistant"
+	var system_content = "You are a helpful assistant that can transcribe pdf blob files to text."
 	var assistant_content = "Respond concisely"
 	var messages = [{"role": "system", "content": system_content}, {"role": "user", "content": prompt}, {"role": "assistant", "content": assistant_content}];
 	var data = {"model": 'gpt-3.5-turbo', 'messages': messages, 'temperature': 0};
@@ -89,8 +89,9 @@ async function call_to_model(pdf_blob) {
 	
 	await fetch(url, options)
 		.then(res => res.json())
-		.then(res => { const text_out = JSON.parse(JSON.stringify(res))['choices'][0]['message']['content'];
-				  console.log('text_out: ', text_out);
+		.then(res => { 
+			//const text_out = JSON.parse(JSON.stringify(res))['choices'][0]['message']['content'];
+				  console.log('res: ', res);
 		})
 		.catch(error => { console.log(error); });
   
