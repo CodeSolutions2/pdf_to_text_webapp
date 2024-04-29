@@ -6,10 +6,14 @@
 <h1>An example of extracting text from a pdf</h1>
 Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf).
 
+<!-- ---------------------------------------- -->
+<!-- Input -->
 <input id="pdf_dataset_url" type="text" value="" placeholder="pdf_dataset_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
-
-<br><br>
-
+<input id="OPENAI_API_KEY" type="text" value="" placeholder="OPENAI_API_KEY" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+<!-- ---------------------------------------- -->
+<br>
+<!-- ---------------------------------------- -->
+<!-- Buttons -->
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
 <br>
 <button id="show_pdf_w_CORS" onclick="show_pdf_w_CORS()">[Step 0] show_pdf_w_CORS</button>
@@ -17,6 +21,9 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <button id="read_text_from_pdf" onclick="read_text_from_pdf()">[Step 1] read_text_from_pdf</button>
 <br>
 <button id="transcribe_pdf" onclick="transcribe_pdf()">[Step 1] transcribe_pdf</button>
+<br>
+<button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
+<!-- ---------------------------------------- -->
 <br>
 
 <!-- <object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object> -->
@@ -36,15 +43,19 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <script>
 	
 const outp = document.getElementById('output');
+
+const file_download_url = document.getElementById("pdf_dataset_url").value;
 	
+const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
+
+
+
 // ----------------------------------------------------
 // Step 0
 // ----------------------------------------------------
 	
 // Show pdf without CORS
 async function show_pdf_wo_CORS() {
-	
-	const file_download_url = document.getElementById("pdf_dataset_url").value;
 	
 	let file_download_url_name = file_download_url.split('/').pop();
 	// console.log("file_download_name: ", file_download_url_name);
@@ -66,8 +77,6 @@ async function show_pdf_wo_CORS() {
 
 // Show pdf WITH CORS
 async function show_pdf_w_CORS() {
-	
-	const file_download_url = document.getElementById("pdf_dataset_url").value;
 	
 	// Try 0: using embed 
 	// var embedElement = document.createElement('embed');
@@ -95,7 +104,7 @@ async function show_pdf_w_CORS() {
 	// It opens a new page with the pdf inside, and then it automatically downloads the pdf using print on the original page
 
 	// Try 2: using an object
-	var objectElement = document.createElement('iframe');
+	var objectElement = document.createElement('object');
 	document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
 	var contentWindow = objectElement.contentWindow;
 	contentWindow.document.open();
@@ -120,11 +129,9 @@ async function show_pdf_w_CORS() {
 // WORKS but unreadable
 async function read_text_from_pdf() {
 
-	const file_download_url = document.getElementById("pdf_dataset_url").value;
-
 	return await GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download_url)
 		.then(async function(text_out) {
-			console.log('text_out: ', text_out);
+			// console.log('text_out: ', text_out);
 		})
 
 }
@@ -135,8 +142,19 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 
 	return await fetch(file_download_url)
 		.then(res => res.text())
-		.then(data => { 
-			console.log('data: ', data); return data;
+		.then(str_data => { 
+			console.log('str_data: ', str_data); 
+			
+			// try to decode characters from [stream to endstream]
+			let valstofind = /stream(.*?)endstream/g;
+			var matches = valstofind.exec(str_data);
+			console.log('matches: ', matches);
+
+			var one_match_string = str_data.match(valstofind);
+			let data_decoded = atob(one_match_string);
+			console.log('data_decoded:', data_decoded);
+			
+			return str_data;
 		})
 		.catch(error => { console.log(error); });
 }
@@ -147,14 +165,17 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 // Way 1: use pdf.js
 async function transcribe_pdf() {
 
-	
-	const file_download_url = document.getElementById("pdf_dataset_url").value;
 	let url = file_download_url.split('/').pop();
 	console.log("url: ", url);
-	
+
 	// Asynchronous download PDF
-	const loadingTask = pdfjsLib.getDocument(url);
-	console.log("loadingTask: ", loadingTask);
+	pdfjsLib.getDocument(url)
+		.then(response => response)
+		.then(async function(pdfDoc) { 
+			console.log("pdfDoc: ", pdfDoc);
+			// return pdf_blob_object; 
+		})
+		.catch(error => { console.log(error); });
 	
 	// const pdf = await loadingTask;
   
@@ -190,48 +211,88 @@ async function transcribe_pdf() {
 // Way 2: try to transcribe pdf with Assistant
 async function extract_text_from_pdf_using_OpenAI_assistant() {
 	
-	var file_download_url = outp.innerHTML;
-	
 	await fetch(file_download_url)
-  				.then(response => response.blob())
-			 	.then(async function(blob_object) { 
-					// console.log("blob_object: ", blob_object);
-					await call_to_model(blob_object);
-				})
-				.then(async function() { await new Promise(r => setTimeout(r, 200)); })
-				.catch(error => { console.log(error); });
+		.then(response => response.blob())
+		.then(async function(pdf_blob_object) { 
+			// console.log("pdf_blob_object: ", pdf_blob_object);
+			return pdf_blob_object; 
+		})
+		.then(async function() { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
+		.then(async function() { await create_an_assistant() })
+		.catch(error => { console.log(error); });
 
 }
 	
 
 	
-async function call_to_model(pdf_blob) {
-
-	const prompt = `Extract the text from the given pdf blob file: ${pdf_blob}`;
+async function create_an_assistant() {
 	
-	// ------------------------------------------
 	var url = 'https://api.openai.com/v1/assistants'
   
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v1'}
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
-  // var system_content = "You are a helpful assistant that can transcribe pdf blob files to text."
-	// var assistant_content = "Respond concisely"
-	// var messages = [{"role": "system", "content": system_content}, {"role": "user", "content": prompt}, {"role": "assistant", "content": assistant_content}];
-	var data = {"instructions": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "name": "Pdf Transcriber", "tools": [], "model": 'gpt-4'};
+	var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}}};
   
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	
 	// ------------------------------------------
 	
 	await fetch(url, options)
 		.then(res => res.json())
 		.then(res => { 
-			//const text_out = JSON.parse(JSON.stringify(res))['choices'][0]['message']['content'];
-				  console.log('out: ', JSON.parse(JSON.stringify(res))['choices'][0]['message']['content']);
+			let output = JSON.parse(JSON.stringify(res));
+			console.log("output: ", output);
 		})
-		.catch(error => { console.log(error); });
+		.catch(error => { console.log("error: ", error); });
   
 }
+	
 // ----------------------------------------------------
+
+async function upload_files_to_a_vector_store(file_input, filename, which_input) {
+	
+	// const url = "https://api.openai.com/v1/vectorStores";
+	const url = "https://api.openai.com/v1/files";
+
+	const headers = new Headers();
+	headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
+	headers.append("Accept", "application/json");
+	
+	const formData = new FormData();
+	if (which_input == 'blob_object') {
+		// WORKS: but filename is 'blob', one can not specifically name the file
+		formData.append("file", file_input);
+	} else {
+		// file_blob_object: specifically name the file
+		formData.append("file", file_input, filename);
+	}
+	formData.append("name", "pdf transcriber");
+	
+	const options = {method: 'POST', 
+		       headers: headers, 
+		       body: formData,
+		       redirect: "follow"};
+
+	
+	await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			console.log("output :", output);
+			let file_id = output['id'];
+			console.log('file_id: ', file_id);
+			outp.innerHTML = file_id;
+		})
+	 	.catch(error => { console.log(error); });
+}
+	
+// ----------------------------------------------------
+
+
+// const prompt = `Extract the text from the given pdf blob file: ${pdf_blob}`;
+
+
+// ------------------------------------------
 
   
 </script>
