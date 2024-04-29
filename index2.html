@@ -45,7 +45,6 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 const outp = document.getElementById('output');
 
 const file_download_url = document.getElementById("pdf_dataset_url").value;
-	
 const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
 
 
@@ -99,7 +98,7 @@ async function show_pdf_w_CORS() {
 	// document.body.appendChild(iframeElement); // it can not open the new window if the Element is not added to the DOM
 	// var contentWindow = iframeElement.contentWindow;
 	// contentWindow.document.open();
-	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1800" frameborder="0" marginheight="0" marginwidth="0">');
+	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
 	// contentWindow.document.close();
 	// It opens a new page with the pdf inside, and then it automatically downloads the pdf using print on the original page
 
@@ -108,7 +107,7 @@ async function show_pdf_w_CORS() {
 	document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
 	var contentWindow = objectElement.contentWindow;
 	contentWindow.document.open();
-	contentWindow.document.write('<object data="' + file_download_url + '" onload="print();" width="1000" height="1200">');
+	contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
 	contentWindow.document.close();
 
 }
@@ -143,7 +142,7 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 	return await fetch(file_download_url)
 		.then(res => res.text())
 		.then(str_data => { 
-			console.log('str_data: ', str_data); 
+			// console.log('str_data: ', str_data); 
 			
 			// try to decode characters from [stream to endstream]
 			let valstofind = /stream(.*?)endstream/g;
@@ -151,6 +150,7 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 			console.log('matches: ', matches);
 
 			var one_match_string = str_data.match(valstofind);
+			console.log('one_match_string: ', one_match_string);
 			let data_decoded = atob(one_match_string);
 			console.log('data_decoded:', data_decoded);
 			
@@ -217,7 +217,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			// console.log("pdf_blob_object: ", pdf_blob_object);
 			return pdf_blob_object; 
 		})
-		.then(async function() { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
+		.then(async function(pdf_blob_object) { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
 		.then(async function() { await create_an_assistant() })
 		.catch(error => { console.log(error); });
 
