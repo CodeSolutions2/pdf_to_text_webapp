@@ -266,7 +266,7 @@ async function upload_files_to_a_vector_store(file_input, filename, which_input)
 		// file_blob_object: specifically name the file
 		formData.append("file", file_input, filename);
 	}
-	formData.append("name", "pdf transcriber");
+	formData.append("purpose", "assistants");
 	
 	const options = {method: 'POST', 
 		       headers: headers, 
