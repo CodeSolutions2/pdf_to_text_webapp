@@ -103,12 +103,13 @@ async function show_pdf_w_CORS() {
 	// It opens a new page with the pdf inside, and then it automatically downloads the pdf using print on the original page
 
 	// Try 2: using an object
-	var objectElement = document.createElement('object');
-	document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
-	var contentWindow = objectElement.contentWindow;
-	contentWindow.document.open();
-	contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
-	contentWindow.document.close();
+	// var objectElement = document.createElement('object');
+	// document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
+	// var contentWindow = objectElement.contentWindow;
+	// contentWindow.document.open();
+	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
+	// contentWindow.document.close();
+	//  TypeError: contentWindow is null
 
 }
 	
@@ -217,7 +218,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			// console.log("pdf_blob_object: ", pdf_blob_object);
 			return pdf_blob_object; 
 		})
-		.then(async function(pdf_blob_object) { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
+		//.then(async function(pdf_blob_object) { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
 		.then(async function() { await create_an_assistant() })
 		.catch(error => { console.log(error); });
 
@@ -226,6 +227,11 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 
 	
 async function create_an_assistant() {
+
+	// let file_id = outp.innerHTML;
+	let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
+
+	// ------------------------------------------
 	
 	var url = 'https://api.openai.com/v1/assistants'
   
