@@ -83,9 +83,26 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 async function show_pdf_w_CORS() {
 
   const file_download_url = document.getElementById("pdf_dataset_url").value;
-  
-  embedElement.setAttribute("src", file_download_url);
-  document.body.appendChild(embedElement);
+
+  // Try 0: using embed
+  // embedElement.setAttribute("src", file_download_url);
+  // document.body.appendChild(embedElement);
+
+
+  // Try 1: using an iframe
+  var proxyIframe = document.createElement('iframe');
+    
+  document.body.appendChild(proxyIframe);
+  // proxyIframe.style.width = '100%';
+  // proxyIframe.style.height = '100%';
+  // proxyIframe.style.display = 'none';
+
+    var contentWindow = proxyIframe.contentWindow;
+    contentWindow.document.open();
+    // Set dimensions according to your needs.
+    // You may need to calculate the dynamically after the content has loaded
+    contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1800" frameborder="0" marginheight="0" marginwidth="0">');
+    contentWindow.document.close();
 }
 
 // ----------------------------------------------------
