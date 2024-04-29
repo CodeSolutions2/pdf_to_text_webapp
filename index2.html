@@ -80,22 +80,30 @@ async function show_pdf_w_CORS() {
 	// forbidden to open pdf file from crosss-domain
 	
 	
-	// Try 1: using an iframe : it opens a new page with the pdf inside, and then it tries to 
-	var iframeElement = document.createElement('iframe');
-	iframeElement.style.width = '100%';
-	iframeElement.style.height = '100%';
-	iframeElement.style.display = 'none';
-	document.body.appendChild(iframeElement);
-  
+	// Try 1: using an iframe
 	// The iframe on the main page is connected to another iframe on a new page
 	// So, one can open a cross-origin file in a new window, but not in the same window 
-	var contentWindow = iframeElement.contentWindow;
+	// var iframeElement = document.createElement('iframe');
+	// iframeElement.style.width = '100%';
+	// iframeElement.style.height = '100%';
+	// iframeElement.style.display = 'none';
+	// document.body.appendChild(iframeElement); // it can not open the new window if the Element is not added to the DOM
+	// var contentWindow = iframeElement.contentWindow;
+	// contentWindow.document.open();
+	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1800" frameborder="0" marginheight="0" marginwidth="0">');
+	// contentWindow.document.close();
+	// It opens a new page with the pdf inside, and then it automatically downloads the pdf using print on the original page
+
+	// Try 2: using an object
+	var objectElement = document.createElement('iframe');
+	document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
+	var contentWindow = objectElement.contentWindow;
 	contentWindow.document.open();
-	contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1800" frameborder="0" marginheight="0" marginwidth="0">');
+	contentWindow.document.write('<object data="' + file_download_url + '" onload="print();" width="1000" height="1200">');
 	contentWindow.document.close();
 
 }
-
+	
 // ----------------------------------------------------
 
 
