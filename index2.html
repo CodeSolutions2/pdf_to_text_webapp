@@ -45,7 +45,7 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 	
 	// Asynchronous download PDF
 	const loadingTask = pdfjsLib.getDocument(url);
-	const pdf = await loadingTask.promise;
+	const pdf = await loadingTask;
   
 	// Fetch the first page
 	const page = await pdf.getPage(1);
