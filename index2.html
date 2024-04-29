@@ -16,27 +16,13 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- Buttons -->
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
 <br>
-<button id="show_pdf_w_CORS" onclick="show_pdf_w_CORS()">[Step 0] show_pdf_w_CORS</button>
-<br>
-<button id="read_text_from_pdf" onclick="read_text_from_pdf()">[Step 1] read_text_from_pdf</button>
-<br>
-<button id="transcribe_pdf" onclick="transcribe_pdf()">[Step 1] transcribe_pdf</button>
+<button id="read_text_from_pdf" onclick="read_text_from_pdf()">[Step 1] read_text_from_pdf</but
 <br>
 <button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
 <!-- ---------------------------------------- -->
 <br>
 
-<!-- <object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object> -->
-
-<!-- Way 0: Step 2  -->
 <div id="output" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
-
-
-<canvas id="the-canvas" style="border: 1px solid black; direction: ltr;"></canvas>
-	
-
-<!-- this loads: https://www.jsdelivr.com/package/npm/pdfjs-dist -->
-<script type="module"> import pdfjsDist from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm' </script>
 
 	
 
@@ -74,47 +60,6 @@ async function show_pdf_wo_CORS() {
 
 // ----------------------------------------------------
 
-// Show pdf WITH CORS
-async function show_pdf_w_CORS() {
-	
-	// Try 0: using embed 
-	// var embedElement = document.createElement('embed');
-	// embedElement.setAttribute("id", "pdf");
-	// embedElement.setAttribute("type", "application/pdf");
-	// embedElement.setAttribute("width", 800);
-	// embedElement.setAttribute("height", 1200);
-	// embedElement.setAttribute("src", file_download_url);
-	// document.body.appendChild(embedElement);
-	// forbidden to open pdf file from crosss-domain
-	
-	
-	// Try 1: using an iframe
-	// The iframe on the main page is connected to another iframe on a new page
-	// So, one can open a cross-origin file in a new window, but not in the same window 
-	// var iframeElement = document.createElement('iframe');
-	// iframeElement.style.width = '100%';
-	// iframeElement.style.height = '100%';
-	// iframeElement.style.display = 'none';
-	// document.body.appendChild(iframeElement); // it can not open the new window if the Element is not added to the DOM
-	// var contentWindow = iframeElement.contentWindow;
-	// contentWindow.document.open();
-	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
-	// contentWindow.document.close();
-	// It opens a new page with the pdf inside, and then it automatically downloads the pdf using print on the original page
-
-	// Try 2: using an object
-	// var objectElement = document.createElement('object');
-	// document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
-	// var contentWindow = objectElement.contentWindow;
-	// contentWindow.document.open();
-	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
-	// contentWindow.document.close();
-	//  TypeError: contentWindow is null
-
-}
-	
-// ----------------------------------------------------
-
 
 
 
@@ -126,7 +71,7 @@ async function show_pdf_w_CORS() {
 // ----------------------------------------------------
 	
 // Way 0: try reading text from the pdf
-// WORKS but unreadable
+// WORKS
 async function read_text_from_pdf() {
 
 	return await GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download_url)
@@ -159,52 +104,6 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 		})
 		.catch(error => { console.log(error); });
 }
-  
-// ----------------------------------------------------
-
-
-// Way 1: use pdf.js
-async function transcribe_pdf() {
-
-	let url = file_download_url.split('/').pop();
-	console.log("url: ", url);
-
-	// Asynchronous download PDF
-	pdfjsLib.getDocument(url)
-		.then(response => response)
-		.then(async function(pdfDoc) { 
-			console.log("pdfDoc: ", pdfDoc);
-			// return pdf_blob_object; 
-		})
-		.catch(error => { console.log(error); });
-	
-	// const pdf = await loadingTask;
-  
-	// Fetch the first page
-	// const page = await pdf.getPage(1);
-	// const scale = 1.5;
-	// const viewport = page.getViewport({ scale });
-	
-	// Support HiDPI-screens.
-	// const outputScale = window.devicePixelRatio || 1;
-
-	// Prepare canvas using PDF page dimensions
-	// const canvas = document.getElementById("the-canvas");
-	// const context = canvas.getContext("2d");
-
-	// canvas.width = Math.floor(viewport.width * outputScale);
-	// canvas.height = Math.floor(viewport.height * outputScale);
-	// canvas.style.width = Math.floor(viewport.width) + "px";
-	// canvas.style.height = Math.floor(viewport.height) + "px";
-	
-	// const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-	// Render PDF page into canvas context
-	// const renderContext = {canvasContext: context, transform, viewport,};
-	// page.render(renderContext);
-	
-}
-
 	
 
 // ----------------------------------------------------
@@ -294,11 +193,6 @@ async function upload_files_to_a_vector_store(file_input, filename, which_input)
 	
 // ----------------------------------------------------
 
-
-// const prompt = `Extract the text from the given pdf blob file: ${pdf_blob}`;
-
-
-// ------------------------------------------
 
   
 </script>
