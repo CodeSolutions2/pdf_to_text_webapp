@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+
+<h1>An example of extracting text from a pdf</h1>
+Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf).
+
+<input id="pdf_dataset_url" type="text" value="" placeholder="pdf_dataset_url" rows="10" cols="100" style="display:block; text-align: left; width: 550px;">
+
+<br><br>
+
+<button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">show_pdf_wo_CORS</button>
+<br>
+<button id="show_pdf_w_CORS" onclick="show_pdf_w_CORS()">show_pdf_w_CORS</button>
+<br>
+
+
+
+<!-- <object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object> -->
+
+<!-- Way 0: Step 2  -->
+<div id="output" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+
+<!-- View text results -->
+<script type="module"> import pdfjsDist from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm' </script>
+    
+<script>
+
+const outp = document.getElementById('output');
+
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+// https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
+var objectElement = document.createElement('object');
+objectElement.setAttribute("type", "application/pdf");
+objectElement.setAttribute("width", 800);
+objectElement.setAttribute("height", 1200);
+
+const repoOwner = 'CodeSolutions2';
+const repoName = 'pdf_to_text_webapp';
+
+var embedElement = document.createElement('embed');
+embedElement.setAttribute("id", "pdf");
+embedElement.setAttribute("type", "application/pdf");
+embedElement.setAttribute("width", 800);
+embedElement.setAttribute("height", 1200);
+
+
+// ----------------------------------------------------
+// Step 0: present pdf without CORS
+// ----------------------------------------------------
+async function show_pdf_wo_CORS() {
+
+  const file_download_url = document.getElementById("pdf_dataset_url").value;
+  
+  let file_download_url_name = file_download_url.split('/').pop();
+  console.log("file_download_name: ", file_download_url_name);
+  
+  objectElement.setAttribute("data", file_download_url_name);
+  // one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
+  document.body.appendChild(objectElement);
+  
+}
+
+// ----------------------------------------------------
+
+async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download_url) {
+
+	return await fetch(file_download_url)
+		.then(res => res.text())
+		.then(data => { 
+			console.log('data: ', data); return data;
+		})
+		.catch(error => { console.log(error); });
+}
+  
+// ----------------------------------------------------
+
+
+// ----------------------------------------------------
+// Step 1: present pdf WITH CORS
+// ----------------------------------------------------
+async function show_pdf_w_CORS() {
+
+  const file_download_url = document.getElementById("pdf_dataset_url").value;
+  
+  embedElement.setAttribute("src", file_download_url);
+  document.body.appendChild(embedElement);
+}
+
+// ----------------------------------------------------
+
+
+
+// ----------------------------------------------------
+
+// Step 2: try to transcribe pdf with Assistant (Way 1)
+
+async function extract_text_from_pdf() {
+	
+	var file_download_url = outp.innerHTML;
+	
+	await fetch(file_download_url)
+  				.then(response => response.blob())
+			 	.then(async function(blob_object) { 
+					// console.log("blob_object: ", blob_object);
+					await call_to_model(blob_object);
+				})
+				.then(async function() { await new Promise(r => setTimeout(r, 200)); })
+				.catch(error => { console.log(error); });
+
+}
+	
+
+	
+async function call_to_model(pdf_blob) {
+
+	const prompt = `Extract the text from the given pdf blob file: ${pdf_blob}`;
+	
+	// ------------------------------------------
+	var url = 'https://api.openai.com/v1/assistants'
+  
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v1'}
+
+  // var system_content = "You are a helpful assistant that can transcribe pdf blob files to text."
+	// var assistant_content = "Respond concisely"
+	// var messages = [{"role": "system", "content": system_content}, {"role": "user", "content": prompt}, {"role": "assistant", "content": assistant_content}];
+	var data = {"instructions": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "name": "Pdf Transcriber", "tools": [], "model": 'gpt-4'};
+  
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	// ------------------------------------------
+	
+	await fetch(url, options)
+		.then(res => res.json())
+		.then(res => { 
+			//const text_out = JSON.parse(JSON.stringify(res))['choices'][0]['message']['content'];
+				  console.log('out: ', JSON.parse(JSON.stringify(res))['choices'][0]['message']['content']);
+		})
+		.catch(error => { console.log(error); });
+  
+}
+// ----------------------------------------------------
+
+  
+</script>
+
+  </body>
+</html>
