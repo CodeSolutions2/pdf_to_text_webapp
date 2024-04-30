@@ -266,7 +266,8 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		//})
 		//.then(async function() { await create_an_assistant(); })
 		//.then(async function() { await update_assistant_with_file(); })
-		.then(async function() { await create_a_thread(); })
+		//.then(async function() { await create_a_thread(); })
+		.then(async function() { await run_thread(); })
 		.catch(error => { console.log("error: ", error); });
 
 }
@@ -365,7 +366,8 @@ async function create_an_assistant() {
 }
 
 // ----------------------------------------------------
-	
+
+// Step B (OPTIONAL)
 async function update_assistant_with_file() {
 
 
@@ -374,7 +376,7 @@ async function update_assistant_with_file() {
 	// 'https://api.openai.com/v1/assistants'  // openai.beta.assistants.create OR client.beta.assistants.create
 	// "https://api.openai.com/v1/threads"   // client.beta.threads.create OR openai.beta.threads.create
 
-	const assistant_id = "asst_MWS6KFohyPjB7iBXSWX77U7s";
+	const assistant_id = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
 	
 	const url = 'https://api.openai.com/v1/assistants/'+assistant_id;
 	
@@ -403,7 +405,9 @@ async function update_assistant_with_file() {
 	
 }
 
+// ----------------------------------------------------
 
+// Step C
 async function create_a_thread() {
 
 	// let file_id = outp.innerHTML;
@@ -451,6 +455,56 @@ async function create_a_thread() {
 	
 	// ---------------------------
 	
+	var data = {"messages": messages};
+	
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	
+	// ------------------------------------------
+	
+	await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			console.log("output :", output);
+			// outp.innerHTML = output;
+		})
+	 	.catch(error => { console.log("error: ", error); });
+
+//	Object { id: "thread_LQGBDZQ5WHHa9I4sgRYCdV5F", object: "thread", created_at: 1714492755, metadata: {}, tool_resources: {…} }
+//	created_at: 1714492755
+​//	id: "thread_LQGBDZQ5WHHa9I4sgRYCdV5F"
+​//	metadata: Object {  }
+​//	object: "thread"
+​//	tool_resources: Object { code_interpreter: {…} }
+​​//	code_interpreter: Object { file_ids: (1) […] }
+​​​//	file_ids: Array [ "file-Fw9epDVe1nRf3yuNAWDbQJUp" ]
+​​​​//	0: "file-Fw9epDVe1nRf3yuNAWDbQJUp"
+​​​​//	length: 1
+	
+}
+	
+// ----------------------------------------------------
+
+// Step D
+
+// Add additional messages, queries to the thread
+
+// ----------------------------------------------------
+	
+// Step E
+async function run_thread() {
+
+	// Run a thread with an assistant of choice, after many messages have been appended to one thread
+
+	const url = "https://api.openai.com/v1/threads/THREAD_ID/runs";
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
+	
+	const assistant_id = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
+
+	var prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
+	
+	var messages = {"assistant_id": assistant_id, "model": "gpt-4-turbo", "instructions": prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}]};
+
 	var data = {"messages": messages};
 	
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
