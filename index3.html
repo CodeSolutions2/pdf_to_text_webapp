@@ -23,6 +23,10 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <button id="transcribe_pdf" onclick="transcribe_pdf()">[Step 1] transcribe_pdf</button>
 <br>
 <button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
+<br>
+<button id="update_assistant_with_file" onclick="update_assistant_with_file()">[Step 1: optional] update_assistant_with_file</button>
+
+	
 <!-- ---------------------------------------- -->
 <br>
 
@@ -270,7 +274,7 @@ async function create_an_assistant() {
 
 	// ------------------------------------------
 	
-	var url = 'https://api.openai.com/v1/assistants'
+	var url = 'https://api.openai.com/v1/assistants';  // openai.beta.assistants.create OR client.beta.assistants.create
   
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
@@ -331,6 +335,41 @@ async function upload_files_to_a_vector_store(file_input, filename, which_input)
 	
 // ----------------------------------------------------
 
+async function update_assistant_with_file() {
+
+
+	// 'https://api.openai.com/v1/chat/completions'   // client.chat.completions.create
+	// 'https://api.openai.com/v1/assistants/update'  // client.beta.assistants.update
+	// 'https://api.openai.com/v1/assistants'  // openai.beta.assistants.create OR client.beta.assistants.create
+	// "https://api.openai.com/v1/threads"   // client.beta.threads.create OR openai.beta.threads.create
+
+	const assistant_id = "asst_MWS6KFohyPjB7iBXSWX77U7s";
+	
+	const url = 'https://api.openai.com/v1/assistants/'+assistant_id;
+	
+	let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
+
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY}
+
+	var data = {"tool_resources": { "file_search": { "file_ids": [file_id] } } };
+  
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	
+	// ------------------------------------------
+	
+	await fetch(url, options)
+		.then(res => res.json())
+		.then(res => { 
+			let output = JSON.parse(JSON.stringify(res));
+			console.log("output: ", output);
+		})
+		.catch(error => { console.log("error: ", error); });
+
+
+	
+}
+
+
 async function create_a_thread(pdf_blob_object) {
 
 	// let file_id = outp.innerHTML;
@@ -343,9 +382,10 @@ async function create_a_thread(pdf_blob_object) {
 
 	// ---------------------------
 
-	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
+	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
 	
-	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
+	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
+	// "Files with extensions [none] are not supported for retrieval. See https://platform.openai.com/docs/assistants/tools/file-search/supported-files"
 	
 	//var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id+".id", "tools": [{"type": "file_search"}]}]}];
 	// Files [file-1kLxcQsAJqbyxB2qdjr81XAl.id] were not found", type: "invalid_request_error"
