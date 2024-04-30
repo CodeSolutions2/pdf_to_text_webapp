@@ -349,7 +349,7 @@ async function update_assistant_with_file() {
 	
 	let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
 
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY}
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
 	var data = {"tool_resources": { "file_search": { "file_ids": [file_id] } } };
   
