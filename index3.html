@@ -115,7 +115,8 @@ async function show_pdf_w_CORS() {
 	objectElement.setAttribute('crossOrigin', "");
 
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default
-	objectElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*", "X-Frame-Options": "SAMEORIGIN"});
+	// objectElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
+	objectElement.setAttribute("xFrameOptions", { action: "sameorigin" });
 	objectElement.setAttribute("type", "application/pdf");
 	objectElement.setAttribute("width", 800);
 	objectElement.setAttribute("height", 1200);
@@ -266,7 +267,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			await upload_files_to_a_vector_store(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		})
 		//.then(async function() { await create_an_assistant(); })
-		.then(async function(file_pdf_blob_object) { await create_a_thread(); })
+		.then(async function() { await create_a_thread(); })
 		.catch(error => { console.log("error: ", error); });
 
 }
