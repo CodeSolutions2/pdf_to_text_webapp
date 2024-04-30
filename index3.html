@@ -495,7 +495,7 @@ async function run_thread() {
 	// ---------------------------
 	// Run original Assistant instructions
 	// ---------------------------
-	var messages = {"assistant_id": assistant_id};
+	var data = {"assistant_id": assistant_id};
 	// ---------------------------
 	// OR
 	// ---------------------------
@@ -503,9 +503,8 @@ async function run_thread() {
 	// ---------------------------
 	// var override_original_prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
 	// var messages = {"assistant_id": assistant_id, "model": "gpt-4-turbo", "instructions": override_original_prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}]};
+	// var data = {"messages": messages};
 	// ---------------------------
-
-	var data = {"messages": messages};
 	
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
