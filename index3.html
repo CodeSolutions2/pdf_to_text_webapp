@@ -23,10 +23,6 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <button id="transcribe_pdf" onclick="transcribe_pdf()">[Step 1] transcribe_pdf</button>
 <br>
 <button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
-<br>
-<button id="update_assistant_with_file" onclick="update_assistant_with_file()">[Step 1: optional] update_assistant_with_file</button>
-
-	
 <!-- ---------------------------------------- -->
 <br>
 
@@ -266,58 +262,16 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			// await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); 
 			//await upload_files_to_a_vector_store(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		//})
-		.then(async function() { await create_an_assistant(); })
-		//.then(async function() { await create_a_thread(); })
+		//.then(async function() { await create_an_assistant(); })
+		//.then(async function() { await update_assistant_with_file(); })
+		.then(async function() { await create_a_thread(); })
 		.catch(error => { console.log("error: ", error); });
 
-}
-	
-
-	
-async function create_an_assistant() {
-
-	// let file_id = outp.innerHTML;
-	// let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";	// blob
-	let file_id = "file-Fw9epDVe1nRf3yuNAWDbQJUp";		// file.pdf
-
-	// ------------------------------------------
-	
-	var url = 'https://api.openai.com/v1/assistants';  // openai.beta.assistants.create OR client.beta.assistants.create
-  
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
-
-	// --------------------
-	// Create an assistant for file_search
-	// --------------------
-	// One can not attach tool_resources to file_search
-	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}}};
-	// message: "Unknown parameter: 'tool_resources.file_search.file_ids'.", type: "invalid_request_error"
-	// OR
-	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}]};
-	// --------------------
-
-	// --------------------
-	// Create an assistant for code_interpreter
-	// --------------------
-	var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}}};
-	// --------------------
-	
-	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
-	
-	// ------------------------------------------
-	
-	await fetch(url, options)
-		.then(res => res.json())
-		.then(res => { 
-			let output = JSON.parse(JSON.stringify(res));
-			console.log("output: ", output);
-		})
-		.catch(error => { console.log("error: ", error); });
-  
 }
 	
 // ----------------------------------------------------
 
+// Step A
 async function upload_files_to_a_vector_store(file_input, filename, which_input) {
 	
 	// const url = "https://api.openai.com/v1/vectorStores";
@@ -359,6 +313,57 @@ async function upload_files_to_a_vector_store(file_input, filename, which_input)
 	
 // ----------------------------------------------------
 
+// Step B
+async function create_an_assistant() {
+
+	// let file_id = outp.innerHTML;
+	// let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";	// blob
+	let file_id = "file-Fw9epDVe1nRf3yuNAWDbQJUp";		// file.pdf
+
+	// ------------------------------------------
+	
+	var url = 'https://api.openai.com/v1/assistants';  // openai.beta.assistants.create OR client.beta.assistants.create
+  
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
+
+	// --------------------
+	// Create an assistant for file_search
+	// --------------------
+	// One can not attach tool_resources to file_search
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}}};
+	// message: "Unknown parameter: 'tool_resources.file_search.file_ids'.", type: "invalid_request_error"
+	// OR
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}]};
+	
+	// --------------------
+
+	// --------------------
+	// Create an assistant for code_interpreter
+	// --------------------
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}}};
+	// WORKS, but it was understood that file_search was needed to Transcribe pdf text. 
+	// However the file is attached to code_interpreter, thus one can not perform a file_search thread and find the file_id. 
+	// OR
+	var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}}};
+	// WORKS
+	// --------------------
+	
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	
+	// ------------------------------------------
+	
+	await fetch(url, options)
+		.then(res => res.json())
+		.then(res => { 
+			let output = JSON.parse(JSON.stringify(res));
+			console.log("output: ", output);
+		})
+		.catch(error => { console.log("error: ", error); });
+  
+}
+
+// ----------------------------------------------------
+	
 async function update_assistant_with_file() {
 
 
@@ -430,6 +435,8 @@ async function create_a_thread() {
 	
 	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}} }];
 	// "Unknown parameter: 'messages[0].tools'."
+
+	var messages = [{"role": "user", "content": prompt, "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}} }];
 	
 	// ---------------------------
 	
