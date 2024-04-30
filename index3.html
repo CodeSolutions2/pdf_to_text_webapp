@@ -266,7 +266,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			await upload_files_to_a_vector_store(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		})
 		//.then(async function() { await create_an_assistant(); })
-		//.then(async function(file_pdf_blob_object) { await create_a_thread(file_pdf_blob_object); })
+		.then(async function(file_pdf_blob_object) { await create_a_thread(); })
 		.catch(error => { console.log("error: ", error); });
 
 }
@@ -304,8 +304,8 @@ async function create_an_assistant() {
 
 async function upload_files_to_a_vector_store(file_input, filename, which_input) {
 	
-	// const url = "https://api.openai.com/v1/vectorStores";
-	const url = "https://api.openai.com/v1/files";
+	const url = "https://api.openai.com/v1/vectorStores";
+	// const url = "https://api.openai.com/v1/files";
 
 	const headers = new Headers();
 	headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
@@ -380,10 +380,11 @@ async function update_assistant_with_file() {
 }
 
 
-async function create_a_thread(pdf_blob_object) {
+async function create_a_thread() {
 
 	// let file_id = outp.innerHTML;
-	let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
+	// let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
+	let file_id = "file-Fw9epDVe1nRf3yuNAWDbQJUp";
 	
 	const url = "https://api.openai.com/v1/threads";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
@@ -391,8 +392,10 @@ async function create_a_thread(pdf_blob_object) {
 	var prompt = "Extract the text from this file."
 
 	// ---------------------------
-
-	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
+	
+	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": "file.pdf", "tools": [{"type": "file_search"}]}]}];
+	
+	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
 	//  message: "Invalid type for 'messages[0].attachments[0].file_id': expected a string, but got an object instead."
 	
 	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
@@ -401,7 +404,7 @@ async function create_a_thread(pdf_blob_object) {
 	//var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id+".id", "tools": [{"type": "file_search"}]}]}];
 	// Files [file-1kLxcQsAJqbyxB2qdjr81XAl.id] were not found", type: "invalid_request_error"
 	
-	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}} }];
+	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}} }];
 	// "Unknown parameter: 'messages[0].tools'."
 	// ---------------------------
 	
