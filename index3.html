@@ -256,11 +256,17 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		.then(response => response.blob())
 		.then(async function(pdf_blob_object) { 
 			// console.log("pdf_blob_object: ", pdf_blob_object);
-			return pdf_blob_object; 
+			// return pdf_blob_object; 
+			// OR
+			// Transform blob into a file
+			return new File ([pdf_blob_object], "file.pdf", {type: "application/pdf"});
 		})
-		//.then(async function(pdf_blob_object) { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
+		.then(async function(file_pdf_blob_object) { 
+			// await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); 
+			await upload_files_to_a_vector_store(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
+		})
 		//.then(async function() { await create_an_assistant(); })
-		.then(async function(pdf_blob_object) { await create_a_thread(pdf_blob_object); })
+		//.then(async function(file_pdf_blob_object) { await create_a_thread(file_pdf_blob_object); })
 		.catch(error => { console.log("error: ", error); });
 
 }
@@ -299,7 +305,7 @@ async function create_an_assistant() {
 async function upload_files_to_a_vector_store(file_input, filename, which_input) {
 	
 	// const url = "https://api.openai.com/v1/vectorStores";
-	const url = "https://api.openai.com/v1/files";
+	// const url = "https://api.openai.com/v1/files";
 
 	const headers = new Headers();
 	headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
@@ -351,7 +357,11 @@ async function update_assistant_with_file() {
 
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
-	var data = {"tool_resources": { "file_search": { "file_ids": [file_id] } } };
+	// var data = {"tool_resources": { "file_search": { "file_ids": [file_id] } } };
+	// "Unknown parameter: 'tool_resources.file_search.file_ids'."
+
+	var data = {"tool_resources": { "file_search": { "vector_store_ids": [file_id] } } };
+	
   
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
