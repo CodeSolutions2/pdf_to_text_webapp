@@ -383,6 +383,7 @@ async function create_a_thread(pdf_blob_object) {
 	// ---------------------------
 
 	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
+	//  message: "Invalid type for 'messages[0].attachments[0].file_id': expected a string, but got an object instead."
 	
 	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
 	// "Files with extensions [none] are not supported for retrieval. See https://platform.openai.com/docs/assistants/tools/file-search/supported-files"
