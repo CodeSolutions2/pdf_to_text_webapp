@@ -16,11 +16,7 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- Buttons -->
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
 <br>
-<button id="show_pdf_w_CORS" onclick="show_pdf_w_CORS()">[Step 0] show_pdf_w_CORS</button>
-<br>
 <button id="read_text_from_pdf" onclick="read_text_from_pdf()">[Step 1] read_text_from_pdf</button>
-<br>
-<button id="transcribe_pdf" onclick="transcribe_pdf()">[Step 1] transcribe_pdf</button>
 <br>
 <button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
 <!-- ---------------------------------------- -->
@@ -32,21 +28,7 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <div id="output" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 
 
-<canvas id="the-canvas" style="border: 1px solid black; direction: ltr;"></canvas>
-	
 
-<!-- Try 0 -->
-<!-- this loads: https://www.jsdelivr.com/package/npm/pdfjs-dist -->
-<!-- <script type="module"> import pdfjsDist from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm' </script> -->
-<!--  OK -->
-
-<!-- Try 1 -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm"></script> -->
-<!-- Uncaught SyntaxError: export declarations may only appear at top level of a module -->
-
-<!-- Try 2 -->
-<!-- <script type="text/javascript" src="https://unpkg.com/browse/pdfjs-dist@4.2.67"></script> -->
-<!-- The resource from “https://unpkg.com/browse/pdfjs-dist@4.2.67” was blocked due to MIME type (“text/html”) mismatch (X-Content-Type-Options: nosniff). -->
 
 	
 <script type="text/javascript">
@@ -82,74 +64,6 @@ async function show_pdf_wo_CORS() {
 }
 
 // ----------------------------------------------------
-
-// Show pdf WITH CORS
-async function show_pdf_w_CORS() {
-	
-	// Try 0: using embed 
-	// var embedElement = document.createElement('embed');
-	// embedElement.setAttribute("id", "pdf");
-	// embedElement.setAttribute("type", "application/pdf");
-	// embedElement.setAttribute("width", 800);
-	// embedElement.setAttribute("height", 1200);
-	// embedElement.setAttribute("src", file_download_url);
-	// document.body.appendChild(embedElement);
-	// Forbidden to open pdf file from crosss-domain
-
-	// var embedElement = document.createElement('embed');
-	// embedElement.setAttribute('crossOrigin', "");
-	// embedElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
-	// embedElement.setAttribute("id", "pdf");
-	// embedElement.setAttribute("type", "application/pdf");
-	// embedElement.setAttribute("width", 800);
-	// embedElement.setAttribute("height", 1200);
-	// embedElement.setAttribute("src", file_download_url);
-	// document.body.appendChild(embedElement);
-	// The loading of “https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf” in a frame is denied by “X-Frame-Options“ directive set to “deny“.
-
-	var objectElement = document.createElement('object');
-	objectElement.setAttribute('crossOrigin', "");
-
-	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default
-	// objectElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
-	// objectElement.setAttribute("xFrameOptions", { action: "sameorigin" });
-	objectElement.setAttribute('Content-Security-Policy', 'frame-ancestors sameorigin');
-	
-	objectElement.setAttribute("type", "application/pdf");
-	objectElement.setAttribute("width", 800);
-	objectElement.setAttribute("height", 1200);
-	objectElement.setAttribute("data", file_download_url);
-	document.body.appendChild(objectElement);
-	
-	// Try 1: using an iframe
-	// The iframe on the main page is connected to another iframe on a new page
-	// So, one can open a cross-origin file in a new window, but not in the same window 
-	// var iframeElement = document.createElement('iframe');
-	// iframeElement.style.width = '100%';
-	// iframeElement.style.height = '100%';
-	// iframeElement.style.display = 'none';
-	// document.body.appendChild(iframeElement); // it can not open the new window if the Element is not added to the DOM
-	// var contentWindow = iframeElement.contentWindow;
-	// contentWindow.document.open();
-	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
-	// contentWindow.document.close();
-	// It opens a new page with the pdf inside, and then it automatically downloads the pdf using print on the original page
-
-	// Try 2: using an object
-	// var objectElement = document.createElement('object');
-	// document.body.appendChild(objectElement);  // it can not open the new window if the Element is not added to the DOM
-	// var contentWindow = objectElement.contentWindow;
-	// contentWindow.document.open();
-	// contentWindow.document.write('<iframe src="' + file_download_url + '" onload="print();" width="1000" height="1200" frameborder="0" marginheight="0" marginwidth="0">');
-	// contentWindow.document.close();
-	//  TypeError: contentWindow is null
-
-}
-	
-// ----------------------------------------------------
-
-
-
 
 
 
@@ -192,58 +106,6 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 		})
 		.catch(error => { console.log(error); });
 }
-  
-// ----------------------------------------------------
-
-
-// Way 1: use pdf.js
-async function transcribe_pdf() {
-
-	let url = file_download_url.split('/').pop();
-	console.log("url: ", url);
-
-	var pdfjsLib = window['pdfjs-dist/build/pdf'];
-	
-	// The workerSrc property shall be specified
-	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/browse/pdfjs-dist@4.2.67/build/pdf.worker.js';
-	
-	// Asynchronous download of PDF
-	pdfjsLib.getDocument(url)
-		.then(response => response)
-		.then(async function(pdfDoc) { 
-			console.log("pdfDoc: ", pdfDoc);
-			// return pdf_blob_object; 
-		})
-		.catch(error => { console.log(error); });
-	
-	
-	// const pdf = await loadingTask;
-  
-	// Fetch the first page
-	// const page = await pdf.getPage(1);
-	// const scale = 1.5;
-	// const viewport = page.getViewport({ scale });
-	
-	// Support HiDPI-screens.
-	// const outputScale = window.devicePixelRatio || 1;
-
-	// Prepare canvas using PDF page dimensions
-	// const canvas = document.getElementById("the-canvas");
-	// const context = canvas.getContext("2d");
-
-	// canvas.width = Math.floor(viewport.width * outputScale);
-	// canvas.height = Math.floor(viewport.height * outputScale);
-	// canvas.style.width = Math.floor(viewport.width) + "px";
-	// canvas.style.height = Math.floor(viewport.height) + "px";
-	
-	// const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
-
-	// Render PDF page into canvas context
-	// const renderContext = {canvasContext: context, transform, viewport,};
-	// page.render(renderContext);
-	
-}
-
 	
 
 // ----------------------------------------------------
@@ -367,46 +229,6 @@ async function create_an_assistant() {
 
 // ----------------------------------------------------
 
-// Step B (OPTIONAL)
-async function update_assistant_with_file() {
-
-
-	// 'https://api.openai.com/v1/chat/completions'   // client.chat.completions.create
-	// 'https://api.openai.com/v1/assistants/update'  // client.beta.assistants.update
-	// 'https://api.openai.com/v1/assistants'  // openai.beta.assistants.create OR client.beta.assistants.create
-	// "https://api.openai.com/v1/threads"   // client.beta.threads.create OR openai.beta.threads.create
-
-	const assistant_id = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
-	
-	const url = 'https://api.openai.com/v1/assistants/'+assistant_id;
-	
-	let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
-
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
-
-	// var data = {"tool_resources": { "file_search": { "file_ids": [file_id] } } };
-	// "Unknown parameter: 'tool_resources.file_search.file_ids'."
-
-	var data = {"tool_resources": { "file_search": { "vector_store_ids": [file_id] } } };
-	
-	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
-	
-	// ------------------------------------------
-	
-	await fetch(url, options)
-		.then(res => res.json())
-		.then(res => { 
-			let output = JSON.parse(JSON.stringify(res));
-			console.log("output: ", output);
-		})
-		.catch(error => { console.log("error: ", error); });
-
-
-	
-}
-
-// ----------------------------------------------------
-
 // Step C
 async function create_a_thread() {
 
@@ -470,18 +292,6 @@ async function create_a_thread() {
 		})
 	 	.catch(error => { console.log("error: ", error); });
 
-
-//	Object { id: "thread_LQGBDZQ5WHHa9I4sgRYCdV5F", object: "thread", created_at: 1714492755, metadata: {}, tool_resources: {...} }
-//	created_at: 1714492755
-​//    id: thread_LQGBDZQ5WHHa9I4sgRYCdV5F
-​//	metadata: Object {  }
-​//	object: "thread"
-​//	tool_resources: Object { code_interpreter: {...} }
-​​//	code_interpreter: Object { file_ids: (1) [...] }
-​​​//	file_ids: Array [ "file-Fw9epDVe1nRf3yuNAWDbQJUp" ]
-​​​​//	0: "file-Fw9epDVe1nRf3yuNAWDbQJUp"
-​​​​//	length: 1
-	
 }
 	
 // ----------------------------------------------------
