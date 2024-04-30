@@ -501,9 +501,18 @@ async function run_thread() {
 	
 	const assistant_id = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
 
-	var prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
-	
-	var messages = {"assistant_id": assistant_id, "model": "gpt-4-turbo", "instructions": prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}]};
+	// ---------------------------
+	// Run original Assistant instructions
+	// ---------------------------
+	var messages = {"assistant_id": assistant_id};
+	// ---------------------------
+	// OR
+	// ---------------------------
+	// Run over riding some of the original Assistant instructions
+	// ---------------------------
+	// var override_original_prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
+	// var messages = {"assistant_id": assistant_id, "model": "gpt-4-turbo", "instructions": override_original_prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}]};
+	// ---------------------------
 
 	var data = {"messages": messages};
 	
