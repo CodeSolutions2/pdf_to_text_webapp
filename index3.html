@@ -38,12 +38,14 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- Try 0 -->
 <!-- this loads: https://www.jsdelivr.com/package/npm/pdfjs-dist -->
 <!-- <script type="module"> import pdfjsDist from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm' </script> -->
+<!--  OK -->
 
 <!-- Try 1 -->
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm"></script> -->
+<!-- Uncaught SyntaxError: export declarations may only appear at top level of a module -->
 
 <!-- Try 2 -->
-<!-- <script src="https://unpkg.com/browse/pdfjs-dist@4.2.67"></script> -->
+<script type="text/javascript" src="https://unpkg.com/browse/pdfjs-dist@4.2.67"></script>
 <!-- The resource from “https://unpkg.com/browse/pdfjs-dist@4.2.67” was blocked due to MIME type (“text/html”) mismatch (X-Content-Type-Options: nosniff). -->
 
 	
@@ -107,7 +109,9 @@ async function show_pdf_w_CORS() {
 
 	var objectElement = document.createElement('object');
 	objectElement.setAttribute('crossOrigin', "");
-	objectElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
+
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default
+	objectElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*", "X-Frame-Options": "SAMEORIGIN"});
 	objectElement.setAttribute("type", "application/pdf");
 	objectElement.setAttribute("width", 800);
 	objectElement.setAttribute("height", 1200);
@@ -252,7 +256,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		})
 		//.then(async function(pdf_blob_object) { await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); })
 		//.then(async function() { await create_an_assistant(); })
-		.then(async function() { await create_a_thread(); })
+		.then(async function(pdf_blob_object) { await create_a_thread(pdf_blob_object); })
 		.catch(error => { console.log("error: ", error); });
 
 }
@@ -327,7 +331,7 @@ async function upload_files_to_a_vector_store(file_input, filename, which_input)
 	
 // ----------------------------------------------------
 
-async function create_a_thread() {
+async function create_a_thread(pdf_blob_object) {
 
 	// let file_id = outp.innerHTML;
 	let file_id = "file-1kLxcQsAJqbyxB2qdjr81XAl";
@@ -338,12 +342,16 @@ async function create_a_thread() {
 	var prompt = "Extract the text from this file."
 
 	// ---------------------------
-	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
+
+	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
+	
+	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
 	
 	//var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id+".id", "tools": [{"type": "file_search"}]}]}];
 	// Files [file-1kLxcQsAJqbyxB2qdjr81XAl.id] were not found", type: "invalid_request_error"
 	
-	var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}} }];
+	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}} }];
+	// "Unknown parameter: 'messages[0].tools'."
 	// ---------------------------
 	
 	var data = {"messages": messages};
