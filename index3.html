@@ -286,10 +286,22 @@ async function create_an_assistant() {
   
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
-	var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}}};
+	// --------------------
+	// Create an assistant for file_search
+	// --------------------
+	// One can not attach tool_resources to file_search
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}}};
+	// message: "Unknown parameter: 'tool_resources.file_search.file_ids'.", type: "invalid_request_error"
 	// OR
-	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}}};
-  
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}]};
+	// --------------------
+
+	// --------------------
+	// Create an assistant for code_interpreter
+	// --------------------
+	var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}}};
+	// --------------------
+	
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
 	// ------------------------------------------
