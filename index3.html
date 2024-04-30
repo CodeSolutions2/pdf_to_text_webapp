@@ -305,7 +305,7 @@ async function create_an_assistant() {
 async function upload_files_to_a_vector_store(file_input, filename, which_input) {
 	
 	// const url = "https://api.openai.com/v1/vectorStores";
-	// const url = "https://api.openai.com/v1/files";
+	const url = "https://api.openai.com/v1/files";
 
 	const headers = new Headers();
 	headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
