@@ -471,6 +471,16 @@ async function create_a_thread() {
 	 	.catch(error => { console.log("error: ", error); });
 
 
+//	Object { id: "thread_LQGBDZQ5WHHa9I4sgRYCdV5F", object: "thread", created_at: 1714492755, metadata: {}, tool_resources: {...} }
+//	created_at: 1714492755
+​//	id: "thread_LQGBDZQ5WHHa9I4sgRYCdV5F"
+​//	metadata: Object {  }
+​//	object: "thread"
+​//	tool_resources: Object { code_interpreter: {...} }
+​​//	code_interpreter: Object { file_ids: (1) [...] }
+​​​//	file_ids: Array [ "file-Fw9epDVe1nRf3yuNAWDbQJUp" ]
+​​​​//	0: "file-Fw9epDVe1nRf3yuNAWDbQJUp"
+​​​​//	length: 1
 	
 }
 	
@@ -490,12 +500,14 @@ async function run_thread() {
 	const url = "https://api.openai.com/v1/threads/THREAD_ID/runs";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 	
-	const assistant_id = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
+	// const assistant_id = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
+	const thread_id = "thread_LQGBDZQ5WHHa9I4sgRYCdV5F";
 
 	// ---------------------------
 	// Run original Assistant instructions
 	// ---------------------------
-	var data = {"assistant_id": assistant_id};
+	// var data = {"assistant_id": assistant_id}; // message: "No thread found with id 'THREAD_ID'."
+	var data = {"assistant_id": thread_id};
 	// ---------------------------
 	// OR
 	// ---------------------------
