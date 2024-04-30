@@ -112,7 +112,9 @@ async function show_pdf_w_CORS() {
 
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options?utm_source=mozilla&utm_medium=firefox-console-errors&utm_campaign=default
 	// objectElement.setAttribute('headers', {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"});
-	objectElement.setAttribute("xFrameOptions", { action: "sameorigin" });
+	// objectElement.setAttribute("xFrameOptions", { action: "sameorigin" });
+	objectElement.setAttribute('Content-Security-Policy', 'frame-ancestors sameorigin');
+	
 	objectElement.setAttribute("type", "application/pdf");
 	objectElement.setAttribute("width", 800);
 	objectElement.setAttribute("height", 1200);
@@ -429,14 +431,20 @@ async function create_a_thread() {
 	
 	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id, "tools": [{"type": "file_search"}]}]}];
 	// "Files with extensions [none] are not supported for retrieval. See https://platform.openai.com/docs/assistants/tools/file-search/supported-files"
-	
+
+	// --------------------
+	// Instructions on https://platform.openai.com/docs/assistants/how-it-works/managing-threads-and-messages?lang=python
 	//var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": file_id+".id", "tools": [{"type": "file_search"}]}]}];
 	// Files [file-1kLxcQsAJqbyxB2qdjr81XAl.id] were not found", type: "invalid_request_error"
+	// OR
+	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": "file.pdf", "tools": [{"type": "code_interpreter"}]}]}];
+	// --------------------
 	
 	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [file_id]}} }];
 	// "Unknown parameter: 'messages[0].tools'."
 
-	var messages = [{"role": "user", "content": prompt, "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}} }];
+	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [file_id]}} }];
+	// message: "Unknown parameter: 'messages[0].tools'.", type: "invalid_request_error", param: "messages[0].tools"
 	
 	// ---------------------------
 	
