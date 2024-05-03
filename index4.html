@@ -26,8 +26,6 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- ---------------------------------------- -->
 <br>
 
-<!-- <object style="display:none" data="document.pdf" type="application/pdf" width="800" height="1200"></object> -->
-
 <!-- Way 0: Step 2  -->
 <div id="output" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 
@@ -274,9 +272,9 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		// Step C
 		//.then(async function() { await create_a_thread(); })
 		// Step D
-		.then(async function() { await add_a_message_to_a_thread(); })
+		// .then(async function() { await add_a_message_to_a_thread(); })
 		// Step E
-		.then(async function() { await list_messages_in_a_thread(); })
+		// .then(async function() { await list_messages_in_a_thread(); })
 		// Step F
 		.then(async function() { await run_the_assistant(); })
 		// Step G
@@ -480,9 +478,11 @@ async function list_messages_in_a_thread() {
 // Step F
 async function run_the_assistant() {
 
+	console.log("run_the_assistant :");
+	
 	// Create a run such that the assistant reads the thread and decides whether to call tools or use a model to respond to the query.
-
-	const url = "https://api.openai.com/v1/threads/THREAD_ID/messages";
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 
 	// ---------------------------
@@ -537,6 +537,8 @@ async function check_the_run_status() {
   
 // Step H
 async function display_the_assistants_response() {
+
+	console.log("display_the_assistants_response :");
   
   const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
