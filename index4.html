@@ -35,7 +35,7 @@ const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
 var FILE_ID = "file-Fw9epDVe1nRf3yuNAWDbQJUp";		// file.pdf
 const THREAD_ID = "thread_LQGBDZQ5WHHa9I4sgRYCdV5F";
 const ASSISTANT_ID = "asst_yrvoqgXkLxATkK0lZLzGGK5R";
-const RUN_ID = "";
+const RUN_ID = "run_cn9VuEOjIvBPlm0v0YLhmzmd";
 
 // ----------------------------------------------------
 // Step 0
@@ -96,11 +96,11 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		// Step E
 		// .then(async function() { await list_messages_in_a_thread(); })
 		// Step F
-		.then(async function() { await run_the_assistant(); })
+		// .then(async function() { await run_the_assistant(); })
 		// Step G
-		// .then(async function() { await check_the_run_status(); }) // needs RUN_ID
+		.then(async function() { await check_the_run_status(); }) // needs RUN_ID
 		// Step H
-		// .then(async function() { await display_the_assistants_response(); })
+		.then(async function() { await display_the_assistants_response(); })
 		.catch(error => { console.log("error: ", error); });
 
 }
@@ -331,6 +331,8 @@ async function run_the_assistant() {
 			// outp.innerHTML = output;
 		})
 	 	.catch(error => { console.log("error: ", error); });
+
+	
 }
 
 
@@ -338,6 +340,8 @@ async function run_the_assistant() {
   
 // Step G
 async function check_the_run_status() {
+
+	console.log("check_the_run_status :");
 
   const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID;
   var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
@@ -362,7 +366,8 @@ async function display_the_assistants_response() {
 
 	console.log("display_the_assistants_response :");
   
-  const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+  const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID+"/messages";
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 
   var options = {method : 'post', headers: headers};
