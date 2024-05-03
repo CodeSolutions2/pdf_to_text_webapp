@@ -210,6 +210,9 @@ async function transcribe_pdf() {
 	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/browse/pdfjs-dist@4.2.67/build/pdf.worker.js';
 	
 	// Asynchronous download of PDF
+
+	// Way 0: 
+	// Way 1: what I think is correct
 	pdfjsLib.getDocument(url)
 		.then(response => response)
 		.then(async function(pdfDoc) { 
