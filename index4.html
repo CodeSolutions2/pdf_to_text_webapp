@@ -264,14 +264,25 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			// Transform blob into a file
 			return new File ([pdf_blob_object], "file.pdf", {type: "application/pdf"});
 		})
+		// Step A
 		//.then(async function(file_pdf_blob_object) { 
 			// await upload_files_to_a_vector_store(pdf_blob_object, "", 'blob_object'); 
 			//await upload_files_to_a_vector_store(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		//})
+		// Step B
 		//.then(async function() { await create_an_assistant(); })
-		//.then(async function() { await update_assistant_with_file(); })
+		// Step C
 		//.then(async function() { await create_a_thread(); })
-		.then(async function() { await run_thread(); })
+		// Step D
+		.then(async function() { await add_a_message_to_a_thread(); })
+		// Step E
+		.then(async function() { await list_messages_in_a_thread(); })
+		// Step F
+		.then(async function() { await run_the_assistant(); })
+		// Step G
+		// .then(async function() { await check_the_run_status(); }) // needs RUN_ID
+		// Step H
+		.then(async function() { await display_the_assistants_response(); })
 		.catch(error => { console.log("error: ", error); });
 
 }
