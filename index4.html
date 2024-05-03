@@ -364,11 +364,12 @@ async function check_the_run_status() {
 // Step H
 async function display_the_assistants_response() {
 
-	console.log("display_the_assistants_response :");
+  console.log("display_the_assistants_response :");
   
   const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID+"/messages";
-	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+  // const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+  
+  var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 
   var options = {method : 'post', headers: headers};
 	
