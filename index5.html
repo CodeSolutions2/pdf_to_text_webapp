@@ -51,14 +51,16 @@ var RUN_ID = "";
 
 
 // Step B
-var create_an_assistant_instructions = "You are a PDF document transcribing assistant. You find all written text in pdf files and output the text.";
+// var create_an_assistant_instructions = "You are a PDF document transcribing assistant. You find all written text in pdf files and output the text.";
+var create_an_assistant_instructions = "You are a PDF document content reading assistant. Read the content of a PDF file and print the content. Using the uploaded PDF file, extract the text as output.";
 
 // Step C
-var create_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
-
+// var create_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
+var create_a_thread_content = "Read the content of a PDF file and print the content.";
+	
 // Step D
-var add_a_message_to_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
-
+// var add_a_message_to_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
+var add_a_message_to_a_thread_content = "Read the content of a PDF file and print the content.";
 
 // ----------------------------------------------------
 // Step 0
@@ -127,7 +129,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 				.then(async function(out) {  await new Promise(r => setTimeout(r, 5000)); return out; })
 				.then(async function(out) {
 					var run_status = out;
-					console.log('check_the_run_status: ', out);
+					// console.log('check_the_run_status: ', out);
 						
 					while (flag == 'wait_for_completion') {
 						if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
@@ -145,7 +147,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 						console.log(' c: ', c);
 						c = c + 1;
 					}
-					console.log(' FINAL: ', run_status.status);
+					// console.log(' FINAL: ', run_status.status);
 				})
 				.catch(error => { console.log(' error: ', error); });
 		})
