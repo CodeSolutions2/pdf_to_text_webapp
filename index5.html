@@ -358,12 +358,8 @@ async function run_the_assistant() {
 	// Run over-riding some of the original Assistant instructions
 	// ---------------------------
 	// var override_original_prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
-	var messages = {"assistant_id": ASSISTANT_ID, 
-			// "model": "gpt-4-turbo", 
-			// "instructions": override_original_prompt, 
-			// "tools": [{"type": "code_interpreter"}, {"type": "file_search"}],
-			"temperature": 0
-	};
+	// var messages = {"assistant_id": ASSISTANT_ID, "model": "gpt-4-turbo", "instructions": override_original_prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}], "temperature": 0};
+	var messages = {"assistant_id": ASSISTANT_ID, "temperature": 0};
 	var data = {"messages": messages};
 	// ---------------------------
 	
