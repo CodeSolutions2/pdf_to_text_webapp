@@ -22,16 +22,18 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 
 <!-- Way 0: Step 2  -->
 <div id="output_FILE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_THREAD_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_ASSISTANT_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_THREAD_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_THREAD_MESSAGE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_RUN_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 
 	
 <script>
 	
 const out_FILE_ID = document.getElementById('output_FILE_ID');
-const out_THREAD_ID = document.getElementById('output_THREAD_ID');
 const out_ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID');
+const out_THREAD_ID = document.getElementById('output_THREAD_ID');
+const out_THREAD_MESSAGE_ID = document.getElementById('output_THREAD_MESSAGE_ID');
 const out_RUN_ID = document.getElementById('output_RUN_ID');
 
 const file_download_url = document.getElementById("pdf_dataset_url").value;
@@ -175,8 +177,15 @@ async function create_an_assistant() {
 	// WORKS, but it was understood that file_search was needed to Transcribe pdf text. 
 	// However the file is attached to code_interpreter, thus one can not perform a file_search thread and find the FILE_ID. 
 	// OR
-	var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}}};
-	// WORKS
+	var prompt = "Extract the text from this file.";
+	var data = {"name": "pdf transcriber", 
+		    "description": "You are a transcribing assistant. Extract the text in the file.", 
+		    "instructions": prompt,
+		    "model": "gpt-4-turbo", 
+		    "temperature": 0,
+		    "tools": [{"type": "code_interpreter"}], 
+		    "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}}
+	};
 	// --------------------
 	
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
@@ -312,11 +321,11 @@ async function run_the_assistant() {
 	// ---------------------------
 	// Run original Assistant instructions
 	// ---------------------------
-	var data = {"assistant_id": ASSISTANT_ID}; 
+	var data = {"assistant_id": ASSISTANT_ID};
 	// ---------------------------
 	// OR
 	// ---------------------------
-	// Run over riding some of the original Assistant instructions
+	// Run over-riding some of the original Assistant instructions
 	// ---------------------------
 	// var override_original_prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
 	// var messages = {"assistant_id": assistant_id, "model": "gpt-4-turbo", "instructions": override_original_prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}]};
@@ -334,6 +343,9 @@ async function run_the_assistant() {
 			out_RUN_ID.innerHTML = RUN_ID;
 		})
 	 	.catch(error => { console.log("run_the_assistant error: ", error); });
+
+	// Output contains
+	// assistant_id, id (which is RUN_ID), instructions, model, status: "queued", temperature, thread_id, tool_choice: "auto", tools: {type: "code_interpreter"}, top_p: 1, truncation_strategy: {type: "auto", last_messages: null}
 }
 
 
