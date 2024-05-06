@@ -99,9 +99,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		.then(async function() { await create_a_thread(); console.log("THREAD_ID: ", out_THREAD_ID.innerHTML); })
 		// Step D
 		.then(async function() { await add_a_message_to_a_thread(); })
-		// Step E (OPTIONAL)
-		.then(async function() { await list_messages_in_a_thread(); })
-		// Step F: outputs to out_RUN_ID
+		// Step E: outputs to out_RUN_ID
 		.then(async function() {  await run_the_assistant(); 
 					// console.log("RUN_ID: ", out_RUN_ID.innerHTML); 
 		})
@@ -288,40 +286,15 @@ async function add_a_message_to_a_thread() {
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("add_a_message_to_a_thread :", output);
+			THREAD_MESSAGE_ID = output['id'];
+			out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
 		})
 	 	.catch(error => { console.log("error: ", error); });
 }
 
 // ----------------------------------------------------
-
+  
 // Step E
-async function list_messages_in_a_thread() {
-
-	// ------------------------------------------
-
-	// Retreive needed variables
-	THREAD_ID = out_THREAD_ID.innerHTML;
-
-	// ------------------------------------------
-	
-	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-	var data = {"role": "user", "content": "Text prompt"};
-	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
-	
-	await fetch(url, options)
-	 	.then(response => response.json())
-	 	.then(async function(result) {
-			let output = JSON.parse(JSON.stringify(result));
-			console.log("list_messages_in_a_thread :", output);
-		})
-	 	.catch(error => { console.log("error: ", error); });
-}
-  
-// ----------------------------------------------------
-  
-// Step F
 async function run_the_assistant() {
 
 	// ------------------------------------------
@@ -334,7 +307,7 @@ async function run_the_assistant() {
 	
 	// Create a run such that the assistant reads the thread and decides whether to call tools or use a model to respond to the query.
 	
-	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 
 	// ---------------------------
@@ -368,7 +341,7 @@ async function run_the_assistant() {
 
 // ----------------------------------------------------
   
-// Step G
+// Step F
 async function check_the_run_status() {
 
 	// ------------------------------------------
@@ -392,7 +365,7 @@ async function check_the_run_status() {
   
 // ----------------------------------------------------
   
-// Step H
+// Step G
 async function display_the_assistants_response() {
 
 	// ------------------------------------------
