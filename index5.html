@@ -107,6 +107,38 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		.then(async function() { await add_a_message_to_a_thread(); console.log("THREAD_MESSAGE_ID: ", out_THREAD_MESSAGE_ID.innerHTML); })
 		// Step E: outputs RUN_ID
 		.then(async function() {  await run_the_assistant(); console.log("RUN_ID: ", out_RUN_ID.innerHTML); })
+		// Step F: wait for run to finish
+		.then(async function() { 
+			let flag = 'wait_for_completion';
+			let c = 0;
+			let max_allowed_loops = 30;
+
+			await check_the_run_status()
+				.then(async function(out) {  await new Promise(r => setTimeout(r, 5000)); return out; })
+				.then(async function(out) {
+					var run_status = out;
+					console.log('check_the_run_status: ', out);
+						
+					while (flag == 'wait_for_completion') {
+						if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
+							// wait a bit, call run status again
+							run_status = await check_the_run_status()
+								.then(async function(out) { await new Promise(r => setTimeout(r, 5000)); return out; })
+								.then(async function(run_status) {
+									if (run_status.status == "completed") { flag = "stop loop"; }; 
+									return run_status; 
+								});
+					
+						} else {
+							flag = "stop loop";
+						}
+						console.log(' c: ', c);
+						c = c + 1;
+					}
+					console.log(' FINAL: ', run_status.status);
+				})
+				.catch(error => { console.log(' error: ', error); });
+		})
 		// Step G
 		.then(async function() { await display_the_assistants_response(); })
 		.catch(error => { console.log("error: ", error); });
