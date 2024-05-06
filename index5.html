@@ -135,6 +135,8 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 				})
 				.catch(error => { console.log(' error: ', error); });
 		})
+		// Step G
+		// .then(async function() { await display_the_assistants_response(); })
 		.catch(error => { console.log("error: ", error); });
 }
 	
@@ -347,6 +349,8 @@ async function run_the_assistant() {
 	// ------------------------------------------
 	
 	// Create a run such that the assistant reads the thread and decides whether to call tools or use a model to respond to the query.
+	// https://platform.openai.com/docs/api-reference/runs/createRun
+	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 
@@ -397,15 +401,18 @@ async function check_the_run_status() {
 	RUN_ID = out_RUN_ID.innerHTML;
 
 	// ------------------------------------------
+
+	// https://platform.openai.com/docs/api-reference/runs/getRun
+	// GET https://api.openai.com/v1/threads/{thread_id}/runs/{run_id}
 	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID;
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-	var options = {method : 'post', headers: headers};
+	var headers = {"Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var options = {method : 'GET', headers: headers};
 	
 	return await fetch(url, options)
 	 	.then(response => response.json())
 	 	.then(async function(result) { return JSON.parse(JSON.stringify(result)); })
-	 	.catch(error => { console.log("error: ", error); });
+	 	.catch(error => { console.log("check_the_run_status error: ", error); });
 
 }
   
@@ -421,22 +428,28 @@ async function display_the_assistants_response() {
 
 	// ------------------------------------------
 	
-	// Idea 0: use GET
+	// https://platform.openai.com/docs/api-reference/messages/listMessages?lang=curl
+	// List messages: GET https://api.openai.com/v1/threads/{thread_id}/messages
+	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 	var options = {method : 'GET', headers: headers};
-
-
-	// Idea 1: use different url string
-	// const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages/list";
-	// var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-	// var options = {method : 'POST', headers: headers};
   
 	await fetch(url, options)
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			console.log("display_the_assistants_response :", output);
+
+			output['data'].forEach(async function(row, index){
+				if (THREAD_MESSAGE_ID == row['id']){
+					// This is the desired message
+					var model_output = row['id']['content']['text']['value'];
+					console.log('model_output: ', model_output);
+				}
+			});
+			
+			
 		})
 	 	.catch(error => { console.log("error: ", error); });
 
