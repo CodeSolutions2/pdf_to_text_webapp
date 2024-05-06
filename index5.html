@@ -212,6 +212,8 @@ async function upload_files(file_input, filename, which_input) {
 
 async function upload_files2() {
 
+	console.log('file_download_url: ', file_download_url);
+	
 	await fetch(file_download_url)
 		.then(response => response.blob())
 		.then(async function(pdf_blob_object) { 
