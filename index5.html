@@ -43,11 +43,11 @@ const out_RUN_ID = document.getElementById('output_RUN_ID');
 const file_download_url = document.getElementById("pdf_dataset_url").value;
 const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
 
-var FILE_ID = "file-8qczDjeTiIaRrSMkck126KOp";
-var ASSISTANT_ID = "asst_HYAO1pKcGbnm6aIYcZO8W9lM";
-var THREAD_ID = "thread_fgELuN3QmrRf0WMgqMdaFdf2";
+var FILE_ID = "";
+var ASSISTANT_ID = "";
+var THREAD_ID = "";
 var THREAD_MESSAGE_ID = "";
-var RUN_ID = "run_0YyJ4aDtXzlJaiAVPYq0ImpA";
+var RUN_ID = "";
 
 
 // ----------------------------------------------------
@@ -413,14 +413,13 @@ async function display_the_assistants_response() {
 			let output = JSON.parse(JSON.stringify(result));
 			console.log("display_the_assistants_response :", output);
 
-			// output['data'].forEach(async function(row, index){
-			//	if (THREAD_MESSAGE_ID == row['id']){
+			output['data'].forEach(async function(row, index){
+				if (THREAD_MESSAGE_ID == row['id']){
 					// This is the desired message
-			//		var model_output = row['id']['content']['text']['value'];
-			//		console.log('model_output: ', model_output);
-			//	}
-			//});
-			
+					var model_output = row['id']['content']['text']['value'];
+					console.log('model_output: ', model_output);
+				}
+			});
 			
 		})
 	 	.catch(error => { console.log("error: ", error); });
