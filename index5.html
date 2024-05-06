@@ -28,33 +28,23 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <div id="output_RUN_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 
 	
-<script>
-	
-const out_FILE_ID = document.getElementById('output_FILE_ID');
-const out_ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID');
-const out_THREAD_ID = document.getElementById('output_THREAD_ID');
-const out_THREAD_MESSAGE_ID = document.getElementById('output_THREAD_MESSAGE_ID');
-const out_RUN_ID = document.getElementById('output_RUN_ID');
-
-const file_download_url = document.getElementById("pdf_dataset_url").value;
-const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
-
-var FILE_ID = "";
-var ASSISTANT_ID = "";
-var THREAD_ID = "";
-var THREAD_MESSAGE_ID = "";
-var RUN_ID = "";
 
 
-	
+
+<script crossorigin>
 // ----------------------------------------------------
 // Step 0
 // ----------------------------------------------------
 	
 // Show pdf without CORS
 async function show_pdf_wo_CORS() {
-	
-	let file_download_url_name = file_download_url.split('/').pop();
+
+	// without CORS: name of file
+	// let file_download_url_name = file_download_url.split('/').pop();
+	// console.log("file_download_name: ", file_download_url_name);
+
+	// with CORS: url
+	let file_download_url_name = file_download_url;
 	console.log("file_download_name: ", file_download_url_name);
 
 	// objectElement works
@@ -71,10 +61,25 @@ async function show_pdf_wo_CORS() {
 }
 
 // ----------------------------------------------------
+</script>
 
 
+<script>
+	
+const out_FILE_ID = document.getElementById('output_FILE_ID');
+const out_ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID');
+const out_THREAD_ID = document.getElementById('output_THREAD_ID');
+const out_THREAD_MESSAGE_ID = document.getElementById('output_THREAD_MESSAGE_ID');
+const out_RUN_ID = document.getElementById('output_RUN_ID');
 
+const file_download_url = document.getElementById("pdf_dataset_url").value;
+const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
 
+var FILE_ID = "";
+var ASSISTANT_ID = "";
+var THREAD_ID = "";
+var THREAD_MESSAGE_ID = "";
+var RUN_ID = "";
 
 
 // ----------------------------------------------------
