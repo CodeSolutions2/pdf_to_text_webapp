@@ -38,8 +38,9 @@ const file_download_url = document.getElementById("pdf_dataset_url").value;
 const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
 
 var FILE_ID = "";
-var THREAD_ID = "";
 var ASSISTANT_ID = "";
+var THREAD_ID = "";
+var THREAD_MESSAGE_ID = "";
 var RUN_ID = "";
 
 
@@ -100,9 +101,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		// Step D
 		.then(async function() { await add_a_message_to_a_thread(); })
 		// Step E: outputs to out_RUN_ID
-		.then(async function() {  await run_the_assistant(); 
-					// console.log("RUN_ID: ", out_RUN_ID.innerHTML); 
-		})
+		.then(async function() {  await run_the_assistant(); console.log("RUN_ID: ", out_RUN_ID.innerHTML); })
 		.catch(error => { console.log("error: ", error); });
 }
 	
@@ -313,8 +312,7 @@ async function run_the_assistant() {
 	// ---------------------------
 	// Run original Assistant instructions
 	// ---------------------------
-	var prompt = "Extract the text from this file."
-	var data = {"assistant_id": ASSISTANT_ID, "role": "user", "content": prompt}; 
+	var data = {"assistant_id": ASSISTANT_ID}; 
 	// ---------------------------
 	// OR
 	// ---------------------------
@@ -332,8 +330,8 @@ async function run_the_assistant() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			console.log("run_the_assistant: ", output)
-			// RUN_ID = output['id'];
-			// out_RUN_ID.innerHTML = RUN_ID;
+			RUN_ID = output['id'];
+			out_RUN_ID.innerHTML = RUN_ID;
 		})
 	 	.catch(error => { console.log("run_the_assistant error: ", error); });
 }
