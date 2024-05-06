@@ -134,41 +134,6 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 // ----------------------------------------------------
 
 // Step A
-async function upload_files(file_input, filename, which_input) {
-	
-	const url = "https://api.openai.com/v1/files";
-
-	const headers = new Headers();
-	headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
-	headers.append("Accept", "application/json");
-	
-	const formData = new FormData();
-	if (which_input == 'blob_object') {
-		// WORKS: but filename is 'blob', one can not specifically name the file
-		formData.append("file", file_input);
-	} else {
-		// file_blob_object: specifically name the file
-		formData.append("file", file_input, filename);
-	}
-	formData.append("purpose", "assistants");
-	
-	const options = {method: 'POST', 
-		       headers: headers, 
-		       body: formData,
-		       redirect: "follow"};
-	
-	await fetch(url, options)
-	 	.then(response => response.json())
-	 	.then(async function(result) {
-			let output = JSON.parse(JSON.stringify(result));
-			FILE_ID = output['id'];
-			out_FILE_ID.innerHTML = FILE_ID;
-			console.log("FILE_ID: ", out_FILE_ID.innerHTML);
-		})
-	 	.catch(error => { console.log(error); });
-}
-
-
 async function upload_files2() {
 	
 	await fetch(file_download_url)
@@ -263,7 +228,7 @@ async function create_an_assistant() {
 		    "temperature": 0.02,
 		    "top_p": 1
 	};
-	console.log('data: ', data);
+	
 	// --------------------
 	
 	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
