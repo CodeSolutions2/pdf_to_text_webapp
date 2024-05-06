@@ -30,7 +30,8 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- ---------------------------------------- -->
 <br>
 
-<!-- Way 0: Step 2  -->
+<!-- Text DOM outputs -->
+<div id="output" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_FILE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_ASSISTANT_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_THREAD_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
@@ -42,7 +43,6 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 
 
 <script>
-
 	
 const out_FILE_ID = document.getElementById('output_FILE_ID');
 const out_ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID');
@@ -129,13 +129,13 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			await upload_files(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		})
 		// Step B: outputs ASSISTANT_ID
-		.then(async function() { await create_an_assistant(); console.log("FILE_ID: ", out_FILE_ID.innerHTML); console.log("ASSISTANT_ID: ", out_ASSISTANT_ID.innerHTML); })
+		.then(async function() { await create_an_assistant(); })
 		// Step C: outputs THREAD_ID
-		.then(async function() { await create_a_thread(); console.log("THREAD_ID: ", out_THREAD_ID.innerHTML); })
+		.then(async function() { await create_a_thread(); })
 		// Step D: outputs THREAD_MESSAGE_ID
-		.then(async function() { await add_a_message_to_a_thread(); console.log("THREAD_MESSAGE_ID: ", out_THREAD_MESSAGE_ID.innerHTML); })
+		.then(async function() { await add_a_message_to_a_thread(); })
 		// Step E: outputs RUN_ID
-		.then(async function() {  await run_the_assistant(); console.log("RUN_ID: ", out_RUN_ID.innerHTML); })
+		.then(async function() {  await run_the_assistant(); })
 		// Step F: wait for run to finish
 		.then(async function() { 
 			let flag = 'wait_for_completion';
@@ -161,7 +161,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 						} else {
 							flag = "stop loop";
 						}
-						console.log(' c: ', c);
+						// console.log(' c: ', c);
 						c = c + 1;
 					}
 					// console.log(' FINAL: ', run_status.status);
@@ -205,14 +205,13 @@ async function upload_files(file_input, filename, which_input) {
 			let output = JSON.parse(JSON.stringify(result));
 			FILE_ID = output['id'];
 			out_FILE_ID.innerHTML = FILE_ID;
+			console.log("FILE_ID: ", out_FILE_ID.innerHTML);
 		})
 	 	.catch(error => { console.log(error); });
 }
 
 
 async function upload_files2() {
-
-	console.log('file_download_url: ', file_download_url);
 	
 	await fetch(file_download_url)
 		.then(response => response.blob())
@@ -251,7 +250,9 @@ async function upload_files2() {
 			let output = JSON.parse(JSON.stringify(result));
 			FILE_ID = output['id'];
 			out_FILE_ID.innerHTML = FILE_ID;
+			console.log("FILE_ID: ", out_FILE_ID.innerHTML);
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP A upload_files finished." })
 	 	.catch(error => { console.log(error); });
 }
 
@@ -267,7 +268,6 @@ async function create_an_assistant() {
 		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
 	}
 	FILE_ID = out_FILE_ID.innerHTML;
-	console.log('FILE_ID: ', FILE_ID);
 
 	// ------------------------------------------
 
@@ -318,7 +318,9 @@ async function create_an_assistant() {
 			let output = JSON.parse(JSON.stringify(res));
 			ASSISTANT_ID = output['id'];
 			out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+			console.log("ASSISTANT_ID: ", out_ASSISTANT_ID.innerHTML);
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP B create_an_assistant finished." })
 		.catch(error => { console.log("error: ", error); });
   
 }
@@ -333,6 +335,9 @@ async function create_a_thread() {
 	// ------------------------------------------
 
 	// Retreive needed variables
+	if (out_FILE_ID.innerHTML == ""){
+		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
+	}
 	FILE_ID = out_FILE_ID.innerHTML;
 
 	// ------------------------------------------
@@ -362,7 +367,9 @@ async function create_a_thread() {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_ID = output['id'];
 			out_THREAD_ID.innerHTML = THREAD_ID;
+			console.log("THREAD_ID: ", out_THREAD_ID.innerHTML);
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP C create_a_thread finished." })
 	 	.catch(error => { console.log("error: ", error); });
 	
 }
@@ -390,7 +397,9 @@ async function add_a_message_to_a_thread() {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_MESSAGE_ID = output['id'];
 			out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
+			console.log("THREAD_MESSAGE_ID: ", out_THREAD_MESSAGE_ID.innerHTML);
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP D add_a_message_to_a_thread finished." })
 	 	.catch(error => { console.log("error: ", error); });
 }
 
@@ -428,7 +437,9 @@ async function run_the_assistant() {
 			// console.log("run_the_assistant: ", output)
 			RUN_ID = output['id'];
 			out_RUN_ID.innerHTML = RUN_ID;
+			console.log("RUN_ID: ", out_RUN_ID.innerHTML); 
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP E run_the_assistant finished." })
 	 	.catch(error => { console.log("run_the_assistant error: ", error); });
 
 	// Output contains
@@ -490,11 +501,12 @@ async function wait_for_run_to_finish() {
 				} else {
 					flag = "stop loop";
 				}
-				console.log(' c: ', c);
+				// console.log(' c: ', c);
 				c = c + 1;
 			}
 			// console.log(' FINAL: ', run_status.status);
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP F wait_for_run_to_finish finished." })
 		.catch(error => { console.log(' error: ', error); });
 }
   
@@ -521,14 +533,16 @@ async function display_the_assistants_response() {
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("display_the_assistants_response :", output['data'][index]['content'][0]);
+			
 			
 			// var model_output = [];
-			// output['data'].forEach(async function(row, index){
+			output['data'].forEach(async function(row, index){
+				console.log("display_the_assistants_response :", output['data'][index]['content'][0]);
 			// 	model_output.push(output['data'][index]['content'][0]['text'][0]['value']);
-			// });
+			});
 			// console.log('model_output: ', model_output);
 		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP G display_the_assistants_response finished." })
 	 	.catch(error => { console.log("error: ", error); });
 
 }
