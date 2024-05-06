@@ -267,6 +267,7 @@ async function create_an_assistant() {
 		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
 	}
 	FILE_ID = out_FILE_ID.innerHTML;
+	console.log('FILE_ID: ', FILE_ID);
 
 	// ------------------------------------------
 
@@ -305,7 +306,7 @@ async function create_an_assistant() {
 		    "top_p": 1,
 		    "response_format": {"type": "json_object"}
 	};
-	
+	console.log('data: ', data);
 	// --------------------
 	
 	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
