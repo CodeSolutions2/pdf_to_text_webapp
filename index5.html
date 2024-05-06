@@ -17,6 +17,15 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
 <br>
 <button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
+<br>
+<h3>Individual steps for OpenAI assistant:</h3>
+<button id="upload_files2" onclick="upload_files2()">[Step A] upload_files</button>
+<button id="create_an_assistant" onclick="create_an_assistant()">[Step B] create_an_assistant</button>
+<button id="create_a_thread" onclick="create_a_thread()">[Step C] create_a_thread</button>
+<button id="add_a_message_to_a_thread" onclick="add_a_message_to_a_thread()">[Step D] add_a_message_to_a_thread</button>
+<button id="run_the_assistant" onclick="run_the_assistant()">[Step E] run_the_assistant</button>
+<button id="wait_for_run_to_finish" onclick="wait_for_run_to_finish()">[Step F] wait_for_run_to_finish</button>
+<button id="display_the_assistants_response" onclick="display_the_assistants_response()">[Step G] display_the_assistants_response</button>
 <!-- ---------------------------------------- -->
 <br>
 
@@ -191,7 +200,51 @@ async function upload_files(file_input, filename, which_input) {
 		})
 	 	.catch(error => { console.log(error); });
 }
-	
+
+
+async function upload_files2() {
+
+	await fetch(file_download_url)
+		.then(response => response.blob())
+		.then(async function(pdf_blob_object) { 
+			// console.log("pdf_blob_object: ", pdf_blob_object);
+			// return pdf_blob_object; 
+			// OR
+			// Transform blob into a file
+			return new File ([pdf_blob_object], "file.pdf", {type: "application/pdf"});
+		})
+		.then(async function(file_pdf_blob_object) { 
+			const which_input = 'file_blob_object';  // 'blob_object'
+			
+			const url = "https://api.openai.com/v1/files";
+			const headers = new Headers();
+			headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
+			headers.append("Accept", "application/json");
+			const formData = new FormData();
+			if (which_input == 'blob_object') {
+				// WORKS: but filename is 'blob', one can not specifically name the file
+				formData.append("file", file_pdf_blob_object);
+			} else {
+				// file_blob_object: specifically name the file
+				formData.append("file", file_pdf_blob_object, "file.pdf");
+			}
+			formData.append("purpose", "assistants");
+			const options = {method: 'POST', 
+				       headers: headers, 
+				       body: formData,
+				       redirect: "follow"};
+
+			return await fetch(url, options);
+		})
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			FILE_ID = output['id'];
+			out_FILE_ID.innerHTML = FILE_ID;
+		})
+	 	.catch(error => { console.log(error); });
+}
+
 // ----------------------------------------------------
 
 // Step B
@@ -396,6 +449,40 @@ async function check_the_run_status() {
 	 	.then(async function(result) { return JSON.parse(JSON.stringify(result)); })
 	 	.catch(error => { console.log("check_the_run_status error: ", error); });
 
+}
+
+
+async function wait_for_run_to_finish() {
+	
+	let flag = 'wait_for_completion';
+	let c = 0;
+	let max_allowed_loops = 30;
+
+	await check_the_run_status()
+		.then(async function(out) {  await new Promise(r => setTimeout(r, 5000)); return out; })
+		.then(async function(out) {
+			var run_status = out;
+			// console.log('check_the_run_status: ', out);
+				
+			while (flag == 'wait_for_completion') {
+				if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
+					// wait a bit, call run status again
+					run_status = await check_the_run_status()
+						.then(async function(out) { await new Promise(r => setTimeout(r, 5000)); return out; })
+						.then(async function(run_status) {
+							if (run_status.status == "completed") { flag = "stop loop"; }; 
+							return run_status; 
+						});
+			
+				} else {
+					flag = "stop loop";
+				}
+				console.log(' c: ', c);
+				c = c + 1;
+			}
+			// console.log(' FINAL: ', run_status.status);
+		})
+		.catch(error => { console.log(' error: ', error); });
 }
   
 // ----------------------------------------------------
