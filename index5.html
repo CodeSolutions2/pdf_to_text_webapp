@@ -108,7 +108,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		.then(async function() { 
 			let flag = 'wait_for_completion';
 			let c = 0;
-			let max_allowed_loops = 5;
+			let max_allowed_loops = 10;
 
 			await check_the_run_status()
 				.then(async function(out) {  await new Promise(r => setTimeout(r, 2000)); return out; })
