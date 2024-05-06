@@ -94,22 +94,22 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			await upload_files(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		})
 		// Step B: outputs to out_ASSISTANT_ID
-		.then(async function() { await create_an_assistant(); })
+		.then(async function() { await create_an_assistant(); console.log("FILE_ID: ", out_FILE_ID.innerHTML); console.log("ASSISTANT_ID: ", out_ASSISTANT_ID.innerHTML); })
 		// Step C: outputs to out_THREAD_ID
-		.then(async function() { await create_a_thread(); })
+		.then(async function() { await create_a_thread(); console.log("THREAD_ID: ", out_THREAD_ID.innerHTML); })
 		// Step D
 		.then(async function() { await add_a_message_to_a_thread(); })
 		// Step E (OPTIONAL)
 		// .then(async function() { await list_messages_in_a_thread(); })
 		// Step F: outputs to out_RUN_ID
-		.then(async function() {  await run_the_assistant(); })
+		.then(async function() {  await run_the_assistant(); console.log("RUN_ID: ", out_RUN_ID.innerHTML); })
 		// Step G: wait for run to finish
 		.then(async function() { 
 			let flag = 'wait_for_completion';
 			let c = 0;
 			let max_allowed_loops = 5;
 
-			await check_the_run_status
+			await check_the_run_status()
 				.then(async function(out) { await setTimeout(out, 1500); return out; })
 				.then(async function(out) {
 					var run_status = out;
