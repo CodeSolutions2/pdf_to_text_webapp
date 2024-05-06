@@ -88,25 +88,54 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 			// Transform blob into a file
 			return new File ([pdf_blob_object], "file.pdf", {type: "application/pdf"});
 		})
-		// Step A
+		// Step A: outputs to out_FILE_ID
 		.then(async function(file_pdf_blob_object) { 
 			// await upload_files(pdf_blob_object, "", 'blob_object'); 
 			await upload_files(file_pdf_blob_object, "file.pdf", 'file_blob_object'); 
 		})
-		// Step B
+		// Step B: outputs to out_ASSISTANT_ID
 		.then(async function() { await create_an_assistant(); })
-		// Step C
-		// .then(async function() { await create_a_thread(); })
+		// Step C: outputs to out_THREAD_ID
+		.then(async function() { await create_a_thread(); })
 		// Step D
-		// .then(async function() { await add_a_message_to_a_thread(); })
-		// Step E
+		.then(async function() { await add_a_message_to_a_thread(); })
+		// Step E (OPTIONAL)
 		// .then(async function() { await list_messages_in_a_thread(); })
-		// Step F
-		// .then(async function() { await run_the_assistant(); })
-		// Step G
-		// .then(async function() { await check_the_run_status(); }) // needs RUN_ID
+		// Step F: outputs to out_RUN_ID
+		.then(async function() {  await run_the_assistant(); })
+		// Step G: wait for run to finish
+		.then(async function() { 
+			let flag = 'wait_for_completion';
+			let c = 0;
+			let max_allowed_loops = 5;
+
+			await check_the_run_status
+				.then(async function(out) { await setTimeout(out, 1500); return out; })
+				.then(async function(out) {
+					var run_status = out;
+					console.log('check_the_run_status: ', out)
+						
+					while (flag == 'wait_for_completion') {
+						if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
+							// wait a bit, call run status again
+							run_status = await check_the_run_status()
+								.then(async function(out) { await setTimeout(out, 1500); return out; })
+								.then(async function(run_status) {
+									if (run_status.status == "completed") { flag = "stop loop"; }; 
+									return run_status; 
+								});
+					
+						} else {
+							flag = "stop loop";
+						}
+						c = c + 1;
+					}
+					console.log('check_the_run_status FINAL: ', run_status.status)
+				})
+				.catch(error => { console.log('check_the_run_status error: ', error); });
+		})
 		// Step H
-		// .then(async function() { await display_the_assistants_response(); })
+		.then(async function() { await display_the_assistants_response(); })
 		.catch(error => { console.log("error: ", error); });
 }
 	
@@ -196,8 +225,8 @@ async function create_an_assistant() {
 		.then(res => res.json())
 		.then(res => { 
 			let output = JSON.parse(JSON.stringify(res));
-			console.log('ASSISTANT_ID output: ', output);
-			// out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+			ASSISTANT_ID = output['id'];
+			out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
 		})
 		.catch(error => { console.log("error: ", error); });
   
@@ -209,6 +238,13 @@ async function create_an_assistant() {
 
 // Step C
 async function create_a_thread() {
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	FILE_ID = out_FILE_ID.innerHTML;
+
+	// ------------------------------------------
 	
 	const url = "https://api.openai.com/v1/threads";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
@@ -257,8 +293,8 @@ async function create_a_thread() {
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("output :", output);
-			// outp.innerHTML += output;
+			THREAD_ID = output['id'];
+			out_THREAD_ID.innerHTML = THREAD_ID;
 		})
 	 	.catch(error => { console.log("error: ", error); });
 	
@@ -269,19 +305,25 @@ async function create_a_thread() {
 // Step D
 async function add_a_message_to_a_thread() {
 
-  const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
-  var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	// ------------------------------------------
 
-  var prompt = "Extract the text from this file."
-  var data = {"role": "user", "content": prompt};
-  var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	// Retreive needed variables
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+
+	var prompt = "Extract the text from this file."
+	var data = {"role": "user", "content": prompt};
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
 	await fetch(url, options)
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("output :", output);
-			// outp.innerHTML = output;
+			console.log("add_a_message_to_a_thread :", output);
 		})
 	 	.catch(error => { console.log("error: ", error); });
 }
@@ -290,18 +332,24 @@ async function add_a_message_to_a_thread() {
 
 // Step E
 async function list_messages_in_a_thread() {
-  
-  const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-  var data = {"role": "user", "content": "Text prompt"};
-  var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	var data = {"role": "user", "content": "Text prompt"};
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
 	await fetch(url, options)
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("output :", output);
-			// outp.innerHTML = output;
+			console.log("list_messages_in_a_thread :", output);
 		})
 	 	.catch(error => { console.log("error: ", error); });
 }
@@ -311,7 +359,13 @@ async function list_messages_in_a_thread() {
 // Step F
 async function run_the_assistant() {
 
-	console.log("run_the_assistant :");
+	// ------------------------------------------
+
+	// Retreive needed variables
+	THREAD_ID = out_THREAD_ID.innerHTML;
+	ASSISTANT_ID = out_ASSISTANT_ID.innerHTML;
+
+	// ------------------------------------------
 	
 	// Create a run such that the assistant reads the thread and decides whether to call tools or use a model to respond to the query.
 	
@@ -339,8 +393,8 @@ async function run_the_assistant() {
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("output :", output);
-			// outp.innerHTML = output;
+			RUN_ID = output['id'];
+			out_RUN_ID.innerHTML = RUN_ID;
 		})
 	 	.catch(error => { console.log("error: ", error); });
 }
@@ -351,18 +405,22 @@ async function run_the_assistant() {
 // Step G
 async function check_the_run_status() {
 
-  const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID;
-  var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	// ------------------------------------------
 
-  var options = {method : 'post', headers: headers};
+	// Retreive needed variables
+	THREAD_ID = out_THREAD_ID.innerHTML;
+	RUN_ID = out_RUN_ID.innerHTML;
+
+	// ------------------------------------------
 	
-	await fetch(url, options)
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID;
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+
+	var options = {method : 'post', headers: headers};
+	
+	return await fetch(url, options)
 	 	.then(response => response.json())
-	 	.then(async function(result) {
-			let output = JSON.parse(JSON.stringify(result));
-			console.log("output :", output);
-			// outp.innerHTML = output;
-		})
+	 	.then(async function(result) { return JSON.parse(JSON.stringify(result)); })
 	 	.catch(error => { console.log("error: ", error); });
 
 }
@@ -372,25 +430,29 @@ async function check_the_run_status() {
 // Step H
 async function display_the_assistants_response() {
 
-	console.log("display_the_assistants_response :");
+	// ------------------------------------------
 
-  // Idea 0: use GET
-  const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+	// Retreive needed variables
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	// Idea 0: use GET
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-  var options = {method : 'GET', headers: headers};
+	var options = {method : 'GET', headers: headers};
 
 
-  // Idea 1: use different url string
-  // const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages/list";
+	// Idea 1: use different url string
+	// const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages/list";
 	// var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-  // var options = {method : 'POST', headers: headers};
+	// var options = {method : 'POST', headers: headers};
   
 	await fetch(url, options)
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			console.log("output :", output);
-			// outp.innerHTML = output;
+			console.log("display_the_assistants_response :", output);
 		})
 	 	.catch(error => { console.log("error: ", error); });
 
