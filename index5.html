@@ -19,7 +19,8 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
 <br>
 <h3>Individual steps for OpenAI assistant:</h3>
-<button id="upload_files2" onclick="upload_files2()">[Step A] upload_files</button>
+<button id="upload_files2" onclick="upload_files2()">[Step A] upload_files</button><input id="input_FILE_ID" type="text" value="" placeholder="FILE_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<br>
 <button id="create_an_assistant" onclick="create_an_assistant()">[Step B] create_an_assistant</button>
 <button id="create_a_thread" onclick="create_a_thread()">[Step C] create_a_thread</button>
 <button id="add_a_message_to_a_thread" onclick="add_a_message_to_a_thread()">[Step D] add_a_message_to_a_thread</button>
@@ -58,7 +59,14 @@ var THREAD_ID = "";
 var THREAD_MESSAGE_ID = "";
 var RUN_ID = "";
 
+out_FILE_ID.innerHTML = FILE_ID;
+out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+out_THREAD_ID.innerHTML = THREAD_ID;
+out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
+out_RUN_ID.innerHTML = RUN_ID;
 
+
+// Assign prompt values
 // Step B
 // var create_an_assistant_instructions = "You are a PDF document transcribing assistant. You find all written text in pdf files and output the text.";
 var create_an_assistant_instructions = "You are a PDF document content reading assistant. Read the content of a PDF file and print the content. Using the uploaded PDF file, extract the text as output.";
@@ -253,6 +261,9 @@ async function create_an_assistant() {
 	// ------------------------------------------
 
 	// Retreive needed variables
+	if (out_FILE_ID.innerHTML == ""){
+		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
+	}
 	FILE_ID = out_FILE_ID.innerHTML;
 
 	// ------------------------------------------
