@@ -50,6 +50,16 @@ var THREAD_MESSAGE_ID = "";
 var RUN_ID = "";
 
 
+// Step B
+var create_an_assistant_instructions = "You are a PDF document transcribing assistant. You find all written text in pdf files and output the text.";
+
+// Step C
+var create_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
+
+// Step D
+var add_a_message_to_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
+
+
 // ----------------------------------------------------
 // Step 0
 // ----------------------------------------------------
@@ -191,8 +201,10 @@ async function create_an_assistant() {
 	FILE_ID = out_FILE_ID.innerHTML;
 
 	// ------------------------------------------
+
+	// https://platform.openai.com/docs/api-reference/assistants/createAssistant
 	
-	var url = 'https://api.openai.com/v1/assistants';  // openai.beta.assistants.create OR client.beta.assistants.create
+	var url = 'https://api.openai.com/v1/assistants';
   
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
@@ -209,22 +221,22 @@ async function create_an_assistant() {
 
 	// --------------------
 	// Create an assistant for code_interpreter
+	// *** tool_resources code_interpreter is for files, file_search is for vector_stores ***
 	// --------------------
 	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}}};
 	// WORKS, but it was understood that file_search was needed to Transcribe pdf text. 
 	// However the file is attached to code_interpreter, thus one can not perform a file_search thread and find the FILE_ID. 
 	// OR
-	var prompt = "Extract the text from this file.";
 	var data = {"name": "pdf transcriber", 
 		    "description": "You are a transcribing assistant. Extract the text in the file.", 
-		    "instructions": prompt,
+		    "instructions": create_an_assistant_instructions,
 		    "model": "gpt-4-turbo", 
-		    "temperature": 0,
+		    "temperature": 0.02,
+		    "top_p": 1,
 		    "tools": [{"type": "code_interpreter"}], 
 		    "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}}
 	};
-
-	// Note: I could not set temperature to 0, it is always set at 1 (which will give a wrong response)
+	
 	// --------------------
 	
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
@@ -259,43 +271,19 @@ async function create_a_thread() {
 	const url = "https://api.openai.com/v1/threads";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
-	var prompt = "Extract the text from this file."
-
 	// ---------------------------
 
 	// File search enables the assistant with knowledge from files that you or your users upload. Once a file is uploaded, the assistant automatically decides when to retrieve content based on user requests.
 	
 	// Code Interpreter enables the assistant to write and run code. This tool can process files with diverse data and formatting, and generate files such as graphs.
 	
-	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": "file.pdf", "tools": [{"type": "file_search"}]}]}];
-	// message: "Files [file.pdf] were not found", type: "invalid_request_error"
-	
-	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": pdf_blob_object, "tools": [{"type": "file_search"}]}]}];
-	// message: "Invalid type for 'messages[0].attachments[0].file_id': expected a string, but got an object instead."
-
 	// --------------------
 	// Instructions on https://platform.openai.com/docs/assistants/how-it-works/managing-threads-and-messages?lang=python
-	var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": FILE_ID, "tools": [{"type": "code_interpreter"}]}]}];
-	// "Files with extensions [none] are not supported for retrieval. See https://platform.openai.com/docs/assistants/tools/file-search/supported-files"
-	// OR
-	//var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": FILE_ID+".id", "tools": [{"type": "file_search"}]}]}];
-	// Files [file-1kLxcQsAJqbyxB2qdjr81XAl.id] were not found", type: "invalid_request_error"
-	// OR
-	// var messages = [{"role": "user", "content": prompt, "attachments": [{"file_id": "file.pdf", "tools": [{"type": "code_interpreter"}]}]}];
-	// message: "Files [file.pdf] were not found", type: "invalid_request_error"
-	// --------------------
-	
-	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [FILE_ID]}} }];
-	// "Unknown parameter: 'messages[0].tools'."
-
-	// var messages = [{"role": "user", "content": prompt, "tools": [{"type": "code_interpreter"}], "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}} }];
-	// message: "Unknown parameter: 'messages[0].tools'.", type: "invalid_request_error", param: "messages[0].tools"
-	
-	// ---------------------------
+	var messages = [{"role": "user", "content": create_a_thread_content, "attachments": [{"file_id": FILE_ID, "tools": [{"type": "code_interpreter"}]}]}];
 	
 	var data = {"messages": messages};
 	
-	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
 	
 	// ------------------------------------------
 	
@@ -324,9 +312,7 @@ async function add_a_message_to_a_thread() {
 	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
-
-	var prompt = "Extract the text from this file."
-	var data = {"role": "user", "content": prompt};
+	var data = {"role": "user", "content": add_a_message_to_a_thread_content};
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
 	await fetch(url, options)
@@ -363,19 +349,8 @@ async function run_the_assistant() {
 	// ---------------------------
 	var data = {"assistant_id": ASSISTANT_ID};
 	// ---------------------------
-	// OR
-	// ---------------------------
-	// Run over-riding some of the original Assistant instructions
-	// ---------------------------
-	// var override_original_prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
-	// var messages = {"assistant_id": ASSISTANT_ID, "model": "gpt-4-turbo", "instructions": override_original_prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}], "temperature": 0};
-	// var messages = {"assistant_id": ASSISTANT_ID, "temperature": 0}; // returns an error
-	// var data = {"messages": messages};
-	// ---------------------------
-
-	// So, all the Assistant information needs to be set in create_an_assistant
 	
-	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
 	
 	await fetch(url, options)
 	 	.then(response => response.json())
@@ -444,20 +419,17 @@ async function display_the_assistants_response() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			console.log("display_the_assistants_response :", output);
-
-			output['data'].forEach(async function(row, index){
-				if (THREAD_MESSAGE_ID == row['id']){
-					// This is the desired message
-					var model_output = row['id']['content']['text']['value'];
-					console.log('model_output: ', model_output);
-				}
-			});
 			
+			var model_output = [];
+			output['data'].forEach(async function(row, index){
+				model_output.push(output['data'][index]['content'][0]['text'][0]['value']);
+			});
+			console.log('model_output: ', model_output);
 		})
 	 	.catch(error => { console.log("error: ", error); });
 
 }
-  
+	
 // ----------------------------------------------------
   
 </script>
