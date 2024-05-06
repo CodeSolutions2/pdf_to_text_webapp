@@ -104,6 +104,37 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 		.then(async function() { await add_a_message_to_a_thread(); })
 		// Step E: outputs to out_RUN_ID
 		.then(async function() {  await run_the_assistant(); console.log("RUN_ID: ", out_RUN_ID.innerHTML); })
+		// Step F: wait for run to finish
+		.then(async function() { 
+			let flag = 'wait_for_completion';
+			let c = 0;
+			let max_allowed_loops = 5;
+
+			await check_the_run_status()
+				.then(async function(out) {  await new Promise(r => setTimeout(r, 2000)); return out; })
+				.then(async function(out) {
+					var run_status = out;
+					console.log('check_the_run_status: ', out)
+						
+					while (flag == 'wait_for_completion') {
+						if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
+							// wait a bit, call run status again
+							run_status = await check_the_run_status()
+								.then(async function(out) { await new Promise(r => setTimeout(r, 2000)); return out; })
+								.then(async function(run_status) {
+									if (run_status.status == "completed") { flag = "stop loop"; }; 
+									return run_status; 
+								});
+					
+						} else {
+							flag = "stop loop";
+						}
+						c = c + 1;
+					}
+					console.log(' FINAL: ', run_status.status)
+				})
+				.catch(error => { console.log(' error: ', error); });
+		})
 		.catch(error => { console.log("error: ", error); });
 }
 	
@@ -314,7 +345,6 @@ async function run_the_assistant() {
 	// ------------------------------------------
 	
 	// Create a run such that the assistant reads the thread and decides whether to call tools or use a model to respond to the query.
-	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs";
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
 
@@ -328,8 +358,13 @@ async function run_the_assistant() {
 	// Run over-riding some of the original Assistant instructions
 	// ---------------------------
 	// var override_original_prompt = "Extract the text from this file.";  // "New instructions that override the Assistant instructions"
-	// var messages = {"assistant_id": assistant_id, "model": "gpt-4-turbo", "instructions": override_original_prompt, "tools": [{"type": "code_interpreter"}, {"type": "file_search"}]};
-	// var data = {"messages": messages};
+	var messages = {"assistant_id": assistant_id, 
+			// "model": "gpt-4-turbo", 
+			// "instructions": override_original_prompt, 
+			// "tools": [{"type": "code_interpreter"}, {"type": "file_search"}],
+			"temperature": 0
+	};
+	var data = {"messages": messages};
 	// ---------------------------
 	
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
@@ -346,6 +381,7 @@ async function run_the_assistant() {
 
 	// Output contains
 	// assistant_id, id (which is RUN_ID), instructions, model, status: "queued", temperature, thread_id, tool_choice: "auto", tools: {type: "code_interpreter"}, top_p: 1, truncation_strategy: {type: "auto", last_messages: null}
+	
 }
 
 
