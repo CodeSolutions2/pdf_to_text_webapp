@@ -211,23 +211,25 @@ async function show_pdf_w_CORS() {
 	// await proxy1(fetch, handler1)
 	// Uncaught (in promise) TypeError: proxy1(...) is undefined
 
-	await new Proxy(fetch(file_download_url, options), handler1)
-		//.then(res => response.blob())
-		.then(async function(blob_object) {
+	var out = await new Proxy(fetch(file_download_url, options), handler1);
+	console.log('out: ', out);
+	
+		//.then(res => response.blob())   //TypeError: Promise.prototype.then called on incompatible Proxy
+		//.then(async function(blob_object) {
 			// It should be the object
-			console.log('blob_object: ', blob_object);
+		//	console.log('blob_object: ', blob_object);
 
-			var blobUrl = URL.createObjectURL(blob_object);
+		//	var blobUrl = URL.createObjectURL(blob_object);
 
-			var objectElement = document.createElement('object');
-		  	objectElement.setAttribute("id", "pdf_object_element");
-		  	objectElement.setAttribute("type", "application/pdf");
-		  	objectElement.setAttribute("width", 800);
-		  	objectElement.setAttribute("height", 1200);
-		  	objectElement.setAttribute("data", blobUrl);
-		  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
-		})
-		.catch(error => { console.log(error); }); 
+			//var objectElement = document.createElement('object');
+		  	//objectElement.setAttribute("id", "pdf_object_element");
+		  //	objectElement.setAttribute("type", "application/pdf");
+		  	//objectElement.setAttribute("width", 800);
+		  	//objectElement.setAttribute("height", 1200);
+		  	//objectElement.setAttribute("data", blobUrl);
+		  	//document.getElementById('pdf_viewer_output').appendChild(objectElement);
+		//})
+		//.catch(error => { console.log(error); }); 
 	
 }
 
