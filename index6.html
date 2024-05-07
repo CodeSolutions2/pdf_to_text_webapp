@@ -4,7 +4,7 @@
 <body>
 
 <h1>Extracting text from a pdf</h1>
-Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf).
+Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf, https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf).
 
 <!-- ---------------------------------------- -->
 <!-- View two split window -->
@@ -17,6 +17,8 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <input id="pdf_dataset_url" type="text" value="" placeholder="pdf_dataset_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <br>
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
+<br>
+<button id="show_pdf_w_CORS" onclick="show_pdf_w_CORS()">[Step 0] show_pdf_w_CORS</button>
 <br>
 <h3>OpenAI assistant to analyze file: run all steps or individual steps</h3>
 <input id="OPENAI_API_KEY" type="text" value="" placeholder="OPENAI_API_KEY" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
@@ -149,8 +151,72 @@ async function show_pdf_wo_CORS() {
 
 // ----------------------------------------------------
 
+// Show pdf without CORS
+async function show_pdf_w_CORS() {
+	
+	let headers = {
+		// "Content-Type": "application/octet-stream", 
+		// 'Content-Type': 'application/x-www-form-urlencoded',
+		// "Content-Type": "application/json;charset=UTF-8", 
+		"Access-Control-Allow-Origin": "*",
+		"Connection": "keep-alive",
+		//      "processData": false
+		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"
+		};
+	
+	let options = {method: 'GET', // *GET, POST, PUT, DELETE
+		       //mode: 'cors', // no-cors, *cors, same-origin
+		       // cache: "no-cache",  // *default, no-cache, reload, force-cache, only-if-cached
+		       // credentials: "same-origin", // include, *same-origin, omit
+		       headers: headers, 
+		      // redirect: "follow", // manual, *follow, error
+		      //referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+		      };
+
+	
+	
+	// CORS requests are often blocked because the computer requests a web page too fast or too many times, thus not mimicking normal User-Agent behavior. Thus, the receiving site/web page will block the IP address of the request. There can be maybe two ways to prevent this: 0) slow down the fetch request using a proxy function and use the User-Agent header to "act" like a normal user, 1) change your IP address to a different IP address that is often accepted for requesting web pages using a proxy function.
 
 
+	// Way 0: Use a Proxy to maybe slow down the fetch request 
+	// [Step 0] define the target (fetch)
+
+	// [Step 1] define the handler (just print out the output parameters of the fetch request)
+	const handler1 = { apply(target, thisArg, args) { console.log(args); } };
+
+	// [Step 2] define the proxy (a function that modifies the output response of the target)
+	const proxy1 = new Proxy(fetch, handler1);	
+
+	
+	// Way 1: Use a free proxy list
+	// const handler2 = {
+	//   get(target, prop, receiver) {
+	//     if (prop === "protocol") { return "http"; };
+	//     if (prop === "host") { return "202.212.123.44"; };
+	//     if (prop === "port") { return 80; };
+	//     return Reflect.get(...arguments);
+	//   },
+	// };
+	
+	await proxy1(file_download_url)
+		.then(res => response.blob())
+		.then(async function(blob_object) {
+			// It should be the object
+			console.log('blob_object: ', blob_object);
+
+			var blobUrl = URL.createObjectURL(blob_object);
+
+			var objectElement = document.createElement('object');
+		  	objectElement.setAttribute("id", "pdf_object_element");
+		  	objectElement.setAttribute("type", "application/pdf");
+		  	objectElement.setAttribute("width", 800);
+		  	objectElement.setAttribute("height", 1200);
+		  	objectElement.setAttribute("data", blobUrl);
+		  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
+		})
+		.catch(error => { console.log(error); }); 
+	
+}
 
 
 // ----------------------------------------------------
