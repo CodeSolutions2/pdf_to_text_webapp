@@ -12,7 +12,7 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <table style='text-align: left; width: 500px; display:block'>
 <tr>
 	
-<td>
+<th id="pdf_viewer_input">
 <h3>View PDF</h3>
 <input id="pdf_dataset_url" type="text" value="" placeholder="pdf_dataset_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <br>
@@ -37,11 +37,11 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <input id="input_ASSISTANT_ID" type="text" value="" placeholder="ASSISTANT_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <input id="input_THREAD_ID" type="text" value="" placeholder="THREAD_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <input id="input_RUN_ID" type="text" value="" placeholder="RUN_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
-</td>
+</th>
 	
 <!-- ---------------------------------------- -->
 
-<td id="pdf_output">
+<th id="pdf_viewer_output">
 <!-- Text DOM outputs -->
 <div id="notification" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
 <div id="error" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
@@ -50,7 +50,7 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <div id="output_THREAD_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_THREAD_MESSAGE_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
 <div id="output_RUN_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-</td>
+</th>
 	
 </tr>
 </table>
@@ -68,11 +68,11 @@ div#error {color: #bd1f17; }
 
 table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 1px solid black;}
 
-td {vertical-align: top;}
+tr {vertical-align: top; border: 0px solid black; padding: 10px 10px;}
 
-tr {border: 0px solid black; padding: 10px 20px;}
-
-th {border: 1px solid black; padding: 10px 20px;}
+th, td {vertical-align: top; border: 1px solid black; padding: 10px;}
+th#pdf_viewer_input {width: 100%; }
+th#pdf_viewer_output {width: 100%; }
 </style>
 
 	  
@@ -140,7 +140,7 @@ async function show_pdf_wo_CORS() {
   	// one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
   	objectElement.setAttribute("data", file_download_url_name);
   	// document.body.appendChild(objectElement);
-  	document.getElementById('pdf_output').appendChild(objectElement);
+  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
 	  
   } catch (error){
     document.getElementById("error").innerText = error;
