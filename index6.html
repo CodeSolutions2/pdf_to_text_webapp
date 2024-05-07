@@ -198,7 +198,7 @@ async function show_pdf_w_CORS() {
 	//   },
 	// };
 	
-	await proxy1(file_download_url)
+	await fetch(file_download_url, options)
 		.then(res => response.blob())
 		.then(async function(blob_object) {
 			// It should be the object
