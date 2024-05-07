@@ -70,11 +70,11 @@ div {position: relative; top: 0; z-index: 0; padding: 1px; display:block; font-f
 div#notification {color: #3236a8; }
 div#error {color: #bd1f17; }
 
-table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 0px solid black;}
+table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 1px solid black;}
 
-tr {vertical-align: top; border: 0px solid black; padding: 1px 1px; }
+tr {vertical-align: top; border: 1px solid black; padding: 1px 1px; }
 
-th, td {vertical-align: top; border: 0px solid black; padding: 1px; }
+th, td {vertical-align: top; border: 1px solid black; padding: 1px; }
 th#pdf_viewer_input {width: 100%; }
 th#pdf_viewer_output {width: 100%; }
 
@@ -109,9 +109,14 @@ out_RUN_ID.innerHTML = RUN_ID;
 
 
 // Assign prompt values
+// Step A
+var upload_files_filename = "file_pdf_img.pdf"; 
+	
 // Step B
+var create_an_assistant_assistant_name = "pdf_img transcriber";  // pdf transcriber
+var create_an_assistant_description = "You are a helpful PDF document content reading assistant that prints the text content in files.";
 var create_an_assistant_instructions = "You are a helpful PDF document content reading assistant that responds concisely. Read the content of a PDF file and print the content. If the PDF file contains images, use optical character recognition to read the content of the images and print the text. If the PDF file contains encrypted text, decode the encrypted text using base64 decryption. Otherwise, if the PDF file contains readable text, print the text. Format the output concisely with only the response, use the least number of words.";
-
+	
 // Step C
 var create_a_thread_content = "Read the content of a PDF file and print the content. If the PDF file contains images, use optical character recognition to read the content of the images and print the text. If the PDF file contains encrypted text, decode the encrypted text using base64 decryption. Otherwise, if the PDF file contains readable text, print the text. Format the output concisely with only the response, use the least number of words.";
 	
@@ -254,7 +259,7 @@ async function upload_files() {
 			// return pdf_blob_object; 
 			// OR
 			// Transform blob into a file
-			return new File ([pdf_blob_object], "file.pdf", {type: "application/pdf"});
+			return new File ([pdf_blob_object], upload_files_filename, {type: "application/pdf"});
 		})
 		.then(async function(file_pdf_blob_object) { 
 			const which_input = 'file_blob_object';  // 'blob_object'
@@ -269,7 +274,7 @@ async function upload_files() {
 				formData.append("file", file_pdf_blob_object);
 			} else {
 				// file_blob_object: specifically name the file
-				formData.append("file", file_pdf_blob_object, "file.pdf");
+				formData.append("file", file_pdf_blob_object, upload_files_filename);
 			}
 			formData.append("purpose", "assistants");
 			const options = {method: 'POST', 
@@ -310,28 +315,9 @@ async function create_an_assistant() {
   
 	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
 
-	// --------------------
-	// Create an assistant for file_search
-	// --------------------
-	// One can not attach tool_resources to file_search
-	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [FILE_ID]}}};
-	// message: "Unknown parameter: 'tool_resources.file_search.file_ids'.", type: "invalid_request_error"
-	// OR
-	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}]};
-	
-	// --------------------
-
-	// --------------------
-	// Create an assistant for code_interpreter
-	// *** tool_resources code_interpreter is for files, file_search is for vector_stores ***
-	// --------------------
-	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}}};
-	// WORKS, but it was understood that file_search was needed to Transcribe pdf text. 
-	// However the file is attached to code_interpreter, thus one can not perform a file_search thread and find the FILE_ID. 
-	// OR
 	var data = {"model": "gpt-4-turbo",
-		    "name": "pdf transcriber", 
-		    "description": "You are a transcribing assistant. Extract the text in the file.", 
+		    "name": create_an_assistant_assistant_name, 
+		    "description": create_an_assistant_description, 
 		    "instructions": create_an_assistant_instructions,
 		    "tools": [{"type": "code_interpreter"}],
 		    "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}},
