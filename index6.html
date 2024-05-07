@@ -158,7 +158,7 @@ async function show_pdf_wo_CORS() {
 
 // ----------------------------------------------------
 
-// Show pdf without CORS
+// Show pdf WITH CORS
 async function show_pdf_w_CORS() {
 	
 	let headers = {
@@ -212,7 +212,7 @@ async function show_pdf_w_CORS() {
 	// Uncaught (in promise) TypeError: proxy1(...) is undefined
 
 	await new Proxy(fetch(file_download_url, options), handler1)
-		.then(res => response.blob())
+		//.then(res => response.blob())
 		.then(async function(blob_object) {
 			// It should be the object
 			console.log('blob_object: ', blob_object);
