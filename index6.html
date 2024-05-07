@@ -45,13 +45,13 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 
 <th id="pdf_viewer_output">
 <!-- Text DOM outputs -->
-<div id="notification" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="error" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_FILE_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_ASSISTANT_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_THREAD_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_THREAD_MESSAGE_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_RUN_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="notification"></div>
+<div id="error"></div>
+<div id="output_FILE_ID"></div>
+<div id="output_ASSISTANT_ID"></div>
+<div id="output_THREAD_ID"></div>
+<div id="output_THREAD_MESSAGE_ID"></div>
+<div id="output_RUN_ID"></div>
 </th>
 	
 </tr>
@@ -62,21 +62,23 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 
 <!-- ---------------------------------------- -->
 <!-- CSS -->
+<!-- position: absolute; -->
+	
 <style>
-div {position: relative; z-index: 0;}
+div {position: relative; top: 0; z-index: 0; padding: 1px; display:block; font-family:courier; font-size:15px; height:300px; }
 	
 div#notification {color: #3236a8; }
 div#error {color: #bd1f17; }
 
 table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 0px solid black;}
 
-tr {vertical-align: top; border: 0px solid black; padding: 10px 10px;}
+tr {vertical-align: top; border: 0px solid black; padding: 1px 1px; }
 
-th, td {vertical-align: top; border: 0px solid black; padding: 10px;}
+th, td {vertical-align: top; border: 0px solid black; padding: 1px; }
 th#pdf_viewer_input {width: 100%; }
 th#pdf_viewer_output {width: 100%; }
 
-object#pdf_object_element {vertical-align: top;}
+object#pdf_object_element {vertical-align: top; }
 </style>
 
 	  
@@ -585,13 +587,18 @@ async function display_the_assistants_response() {
 			let output = JSON.parse(JSON.stringify(result));
 			
 			document.getElementById('notification').innerHTML = "Assistant Response:";
+			document.getElementById('notification').innerHTML += "\n\n";
 			output['data'].forEach(async function(row, index){
 				let text_output = output['data'][index]['content'][0]['text']['value'];
-				document.getElementById('notification').innerHTML += "\n"+text_output;
+				document.getElementById('notification').innerHTML += text_output;
+				document.getElementById('notification').innerHTML += "\n\n";
 			});
 			
 		})
-		.then(async function() { document.getElementById('notification').innerHTML += "\n"+"STEP G display_the_assistants_response finished."; })
+		.then(async function() { 
+			document.getElementById('notification').innerHTML += "\n\n";
+			document.getElementById('notification').innerHTML += "STEP G display_the_assistants_response finished."; 
+		})
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 
 }
