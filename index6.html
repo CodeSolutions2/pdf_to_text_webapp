@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+
+<h1>Extracting text from a pdf</h1>
+Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf).
+
+<!-- ---------------------------------------- -->
+<!-- View two split window -->
+<div align="left">
+<table style='text-align: left; width: 300px; display:block'>
+<tr>
+<td>
+<h3>View PDF</h3>
+<input id="pdf_dataset_url" type="text" value="" placeholder="pdf_dataset_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<br>
+<button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
+</td>
+</tr>
+<!-- ---------------------------------------- -->
+<tr>
+<td>
+<h3>OpenAI assistant to analyze file: run all steps or individual steps</h3>
+<input id="OPENAI_API_KEY" type="text" value="" placeholder="OPENAI_API_KEY" rows="10" cols="100" style="display:block; text-align: left; width: 150px;">
+<br>
+<h4>(OPTION A) All steps automated for OpenAI assistant:</h4>
+<button id="extract_text_from_pdf_using_OpenAI_assistant" onclick="extract_text_from_pdf_using_OpenAI_assistant()">[Step 1] extract_text_from_pdf_using_OpenAI_assistant</button>
+<br>
+<h4>(OPTION B) Individual steps for OpenAI assistant:</h4>
+<button id="upload_files" onclick="upload_files()">[Step A] upload_files (Required input: pdf url, output: FILE_ID)</button>
+<button id="create_an_assistant" onclick="create_an_assistant()">[Step B] create_an_assistant (Required input: FILE_ID, output: ASSISTANT_ID)</button>
+<button id="create_a_thread" onclick="create_a_thread()">[Step C] create_a_thread (Required input: FILE_ID, output: THREAD_ID)</button>
+<button id="add_a_message_to_a_thread" onclick="add_a_message_to_a_thread()">[Step D] add_a_message_to_a_thread (Required input: THREAD_ID, output: THREAD_MESSAGE_ID)</button>
+<button id="run_the_assistant" onclick="run_the_assistant()">[Step E] run_the_assistant (Required input: ASSISTANT_ID, THREAD_ID, output: RUN_ID)</button>
+<button id="wait_for_run_to_finish" onclick="wait_for_run_to_finish()">[Step F] wait_for_run_to_finish (Required input: THREAD_ID,  RUN_ID, output: completed processing)</button>
+<button id="display_the_assistants_response" onclick="display_the_assistants_response()">[Step G] display_the_assistants_response (Required input: THREAD_ID, output: response)</button>
+<br>
+<input id="input_FILE_ID" type="text" value="" placeholder="FILE_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<input id="input_ASSISTANT_ID" type="text" value="" placeholder="ASSISTANT_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<input id="input_THREAD_ID" type="text" value="" placeholder="THREAD_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<input id="input_RUN_ID" type="text" value="" placeholder="RUN_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+</td>
+</tr>
+</table>
+</div>  
+  
+<!-- ---------------------------------------- -->
+<br>
+
+<!-- Text DOM outputs -->
+<div id="output" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_FILE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_ASSISTANT_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_THREAD_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_THREAD_MESSAGE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_RUN_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
+
+<div id="error" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+
+<!-- --------------------------------------------------- -->
+<!--  {position: absolute; top: 350px;}-->
+	
+<!-- CSS -->
+<style>
+div {position: relative; z-index: 0;}
+
+div#error {position: relative; }
+
+table {vertical-align:top; border: 0px solid black; border-collapse: collapse;}
+  
+td {vertical-align: top;}
+
+tr {border: 0px solid black; padding: 10px 20px;}
+	
+th {border: 1px solid black; padding: 10px 20px;}
+}
+	
+</style>
+
+	  
+<!-- --------------------------------------------------- -->
+
+<script>
+	
+const out_FILE_ID = document.getElementById('output_FILE_ID');
+const out_ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID');
+const out_THREAD_ID = document.getElementById('output_THREAD_ID');
+const out_THREAD_MESSAGE_ID = document.getElementById('output_THREAD_MESSAGE_ID');
+const out_RUN_ID = document.getElementById('output_RUN_ID');
+
+const file_download_url = document.getElementById("pdf_dataset_url").value;
+const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
+
+var FILE_ID = "";
+var ASSISTANT_ID = "";
+var THREAD_ID = "";
+var THREAD_MESSAGE_ID = "";
+var RUN_ID = "";
+
+out_FILE_ID.innerHTML = FILE_ID;
+out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+out_THREAD_ID.innerHTML = THREAD_ID;
+out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
+out_RUN_ID.innerHTML = RUN_ID;
+
+
+// Assign prompt values
+// Step B
+// var create_an_assistant_instructions = "You are a PDF document transcribing assistant. You find all written text in pdf files and output the text.";
+var create_an_assistant_instructions = "You are a PDF document content reading assistant. Read the content of a PDF file and print the content. Using the uploaded PDF file, extract the text as output.";
+
+// Step C
+// var create_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
+var create_a_thread_content = "Read the content of a PDF file and print the content.";
+	
+// Step D
+// var add_a_message_to_a_thread_content = "Identify the text written in the pdf file, in the tool resources, and output the text .";
+var add_a_message_to_a_thread_content = "Read the content of a PDF file and print the content.";
+
+// ----------------------------------------------------
+// Step 0
+// ----------------------------------------------------
+	
+// Show pdf without CORS
+async function show_pdf_wo_CORS() {
+
+  try {
+  	// without CORS: name of file
+  	let file_download_url_name = file_download_url.split('/').pop();
+  	console.log("file_download_name: ", file_download_url_name);
+  
+  	// objectElement works
+  	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+  	// https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
+  	var objectElement = document.createElement('object');
+  	objectElement.setAttribute("type", "application/pdf");
+  	objectElement.setAttribute("width", 800);
+  	objectElement.setAttribute("height", 1200);
+  
+  	// one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
+  	objectElement.setAttribute("data", file_download_url_name);
+  	document.body.appendChild(objectElement);
+  } catch (error){
+    document.getElementById("error").innerText = error;
+  }
+}
+
+// ----------------------------------------------------
+
+
+
+
+
+// ----------------------------------------------------
+// Step 1
+// ----------------------------------------------------
+async function extract_text_from_pdf_using_OpenAI_assistant() {
+
+	// Step A: outputs FILE_ID
+	await upload_files()
+		// Step B: outputs ASSISTANT_ID
+		.then(async function() { await create_an_assistant(); })
+		// Step C: outputs THREAD_ID
+		.then(async function() { await create_a_thread(); })
+		// Step D: outputs THREAD_MESSAGE_ID
+		.then(async function() { await add_a_message_to_a_thread(); })
+		// Step E: outputs RUN_ID
+		.then(async function() {  await run_the_assistant(); })
+		// Step F: wait for run to finish
+		.then(async function() { await wait_for_run_to_finish(); })
+		// Step G
+		.then(async function() { await display_the_assistants_response(); })
+		.catch(error => { document.getElementById('error').innerHTML = error; });
+}
+	
+// ----------------------------------------------------
+
+// Step A
+async function upload_files() {
+	
+	await fetch(file_download_url)
+		.then(response => response.blob())
+		.then(async function(pdf_blob_object) { 
+			// console.log("pdf_blob_object: ", pdf_blob_object);
+			// return pdf_blob_object; 
+			// OR
+			// Transform blob into a file
+			return new File ([pdf_blob_object], "file.pdf", {type: "application/pdf"});
+		})
+		.then(async function(file_pdf_blob_object) { 
+			const which_input = 'file_blob_object';  // 'blob_object'
+			
+			const url = "https://api.openai.com/v1/files";
+			const headers = new Headers();
+			headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
+			headers.append("Accept", "application/json");
+			const formData = new FormData();
+			if (which_input == 'blob_object') {
+				// WORKS: but filename is 'blob', one can not specifically name the file
+				formData.append("file", file_pdf_blob_object);
+			} else {
+				// file_blob_object: specifically name the file
+				formData.append("file", file_pdf_blob_object, "file.pdf");
+			}
+			formData.append("purpose", "assistants");
+			const options = {method: 'POST', 
+				       headers: headers, 
+				       body: formData,
+				       redirect: "follow"};
+
+			return await fetch(url, options);
+		})
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			FILE_ID = output['id'];
+			out_FILE_ID.innerHTML = FILE_ID;
+			console.log("FILE_ID: ", out_FILE_ID.innerHTML);
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP A upload_files finished." })
+	 	.catch(error => { document.getElementById('error').innerHTML = error; });
+}
+
+// ----------------------------------------------------
+
+// Step B
+async function create_an_assistant() {
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	if (out_FILE_ID.innerHTML == ""){
+		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
+	}
+	FILE_ID = out_FILE_ID.innerHTML;
+
+	// ------------------------------------------
+
+	// https://platform.openai.com/docs/api-reference/assistants/createAssistant
+	
+	var url = 'https://api.openai.com/v1/assistants';
+  
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
+
+	// --------------------
+	// Create an assistant for file_search
+	// --------------------
+	// One can not attach tool_resources to file_search
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"file_search":{"file_ids": [FILE_ID]}}};
+	// message: "Unknown parameter: 'tool_resources.file_search.file_ids'.", type: "invalid_request_error"
+	// OR
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Transcribe the pdf blob file to text.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}]};
+	
+	// --------------------
+
+	// --------------------
+	// Create an assistant for code_interpreter
+	// *** tool_resources code_interpreter is for files, file_search is for vector_stores ***
+	// --------------------
+	// var data = {"name": "pdf transcriber", "description": "You are a transcribing assistant. Extract the text in the file.", "model": "gpt-4-turbo", "tools": [{"type": "file_search"}], "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}}};
+	// WORKS, but it was understood that file_search was needed to Transcribe pdf text. 
+	// However the file is attached to code_interpreter, thus one can not perform a file_search thread and find the FILE_ID. 
+	// OR
+	var data = {"model": "gpt-4-turbo",
+		    "name": "pdf transcriber", 
+		    "description": "You are a transcribing assistant. Extract the text in the file.", 
+		    "instructions": create_an_assistant_instructions,
+		    "tools": [{"type": "code_interpreter"}],
+		    "tool_resources": {"code_interpreter":{"file_ids": [FILE_ID]}},
+		    "temperature": 0.02,
+		    "top_p": 1
+	};
+	
+	// --------------------
+	
+	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
+	
+	// ------------------------------------------
+	
+	await fetch(url, options)
+		.then(res => res.json())
+		.then(res => { 
+			let output = JSON.parse(JSON.stringify(res));
+			ASSISTANT_ID = output['id'];
+			out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+			console.log("ASSISTANT_ID: ", out_ASSISTANT_ID.innerHTML);
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP B create_an_assistant finished." })
+		.catch(error => { document.getElementById('error').innerHTML = error; });
+  
+}
+
+
+
+// ----------------------------------------------------
+
+// Step C
+async function create_a_thread() {
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	if (out_FILE_ID.innerHTML == ""){
+		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
+	}
+	FILE_ID = out_FILE_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	const url = "https://api.openai.com/v1/threads";
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
+
+	// ---------------------------
+
+	// File search enables the assistant with knowledge from files that you or your users upload. Once a file is uploaded, the assistant automatically decides when to retrieve content based on user requests.
+	
+	// Code Interpreter enables the assistant to write and run code. This tool can process files with diverse data and formatting, and generate files such as graphs.
+	
+	// --------------------
+	// Instructions on https://platform.openai.com/docs/assistants/how-it-works/managing-threads-and-messages?lang=python
+	var messages = [{"role": "user", "content": create_a_thread_content, "attachments": [{"file_id": FILE_ID, "tools": [{"type": "code_interpreter"}]}]}];
+	
+	var data = {"messages": messages};
+	
+	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
+	
+	// ------------------------------------------
+	
+	await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			THREAD_ID = output['id'];
+			out_THREAD_ID.innerHTML = THREAD_ID;
+			console.log("THREAD_ID: ", out_THREAD_ID.innerHTML);
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP C create_a_thread finished." })
+	 	.catch(error => { document.getElementById('error').innerHTML = error; });
+	
+}
+	
+// ----------------------------------------------------
+
+// Step D
+async function add_a_message_to_a_thread() {
+
+	// ------------------------------------------
+
+  // Retreive needed variables
+	if (out_THREAD_ID.innerHTML == ""){
+		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	}
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var data = {"role": "user", "content": add_a_message_to_a_thread_content};
+	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
+	
+	await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			THREAD_MESSAGE_ID = output['id'];
+			out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
+			console.log("THREAD_MESSAGE_ID: ", out_THREAD_MESSAGE_ID.innerHTML);
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP D add_a_message_to_a_thread finished." })
+	 	.catch(error => { document.getElementById('error').innerHTML = error; });
+}
+
+// ----------------------------------------------------
+  
+// Step E
+async function run_the_assistant() {
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	if (out_THREAD_ID.innerHTML == ""){
+		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	}
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+  // Retreive needed variables
+	if (out_ASSISTANT_ID.innerHTML == ""){
+		out_ASSISTANT_ID.innerHTML = document.getElementById("input_ASSISTANT_ID").value;
+	}
+	ASSISTANT_ID = out_ASSISTANT_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	// Create a run such that the assistant reads the thread and decides whether to call tools or use a model to respond to the query.
+	// https://platform.openai.com/docs/api-reference/runs/createRun
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs";
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+
+	// ---------------------------
+	// Run original Assistant instructions
+	// ---------------------------
+	var data = {"assistant_id": ASSISTANT_ID};
+	// ---------------------------
+	
+	var options = {method : 'POST', headers: headers, body : JSON.stringify(data)};
+	
+	await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			// console.log("run_the_assistant: ", output)
+			RUN_ID = output['id'];
+			out_RUN_ID.innerHTML = RUN_ID;
+			console.log("RUN_ID: ", out_RUN_ID.innerHTML); 
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP E run_the_assistant finished." })
+	 	.catch(error => { document.getElementById('error').innerHTML = error; });
+
+	// Output contains
+	// assistant_id, id (which is RUN_ID), instructions, model, status: "queued", temperature, thread_id, tool_choice: "auto", tools: {type: "code_interpreter"}, top_p: 1, truncation_strategy: {type: "auto", last_messages: null}
+	
+}
+
+
+// ----------------------------------------------------
+  
+// Step F
+async function check_the_run_status() {
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	if (out_THREAD_ID.innerHTML == ""){
+		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	}
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+	// Retreive needed variables
+	if (out_RUN_ID.innerHTML == ""){
+		out_RUN_ID.innerHTML = document.getElementById("input_RUN_ID").value;
+	}
+	RUN_ID = out_RUN_ID.innerHTML;
+
+
+	// ------------------------------------------
+
+	// https://platform.openai.com/docs/api-reference/runs/getRun
+	// GET https://api.openai.com/v1/threads/{thread_id}/runs/{run_id}
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID;
+	var headers = {"Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var options = {method : 'GET', headers: headers};
+	
+	return await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) { return JSON.parse(JSON.stringify(result)); })
+	 	.catch(error => { document.getElementById('error').innerHTML = error; });
+
+}
+
+
+async function wait_for_run_to_finish() {
+	
+	let flag = 'wait_for_completion';
+	let c = 0;
+	let max_allowed_loops = 30;
+
+	await check_the_run_status()
+		.then(async function(out) {  await new Promise(r => setTimeout(r, 5000)); return out; })
+		.then(async function(out) {
+			var run_status = out;
+			// console.log('check_the_run_status: ', out);
+				
+			while (flag == 'wait_for_completion') {
+				if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
+					// wait a bit, call run status again
+					run_status = await check_the_run_status()
+						.then(async function(out) { await new Promise(r => setTimeout(r, 5000)); return out; })
+						.then(async function(run_status) {
+							if (run_status.status == "completed") { flag = "stop loop"; }; 
+							return run_status; 
+						});
+			
+				} else {
+					flag = "stop loop";
+				}
+				// console.log(' c: ', c);
+				c = c + 1;
+			}
+			// console.log(' FINAL: ', run_status.status);
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP F wait_for_run_to_finish finished." })
+		.catch(error => { document.getElementById('error').innerHTML = error; });
+}
+  
+// ----------------------------------------------------
+  
+// Step G
+async function display_the_assistants_response() {
+
+	// ------------------------------------------
+
+	// Retreive needed variables
+	if (out_THREAD_ID.innerHTML == ""){
+		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	}
+	THREAD_ID = out_THREAD_ID.innerHTML;
+
+	// ------------------------------------------
+	
+	// https://platform.openai.com/docs/api-reference/messages/listMessages?lang=curl
+	// List messages: GET https://api.openai.com/v1/threads/{thread_id}/messages
+	
+	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
+	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var options = {method : 'GET', headers: headers};
+  
+	await fetch(url, options)
+	 	.then(response => response.json())
+	 	.then(async function(result) {
+			let output = JSON.parse(JSON.stringify(result));
+			
+			
+			// var model_output = [];
+			output['data'].forEach(async function(row, index){
+				console.log("display_the_assistants_response :", output['data'][index]['content'][0]);
+			// 	model_output.push(output['data'][index]['content'][0]['text'][0]['value']);
+			});
+			// console.log('model_output: ', model_output);
+		})
+		.then(async function() { document.getElementById('output').innerHTML = "STEP G display_the_assistants_response finished." })
+	 	.catch(error => { document.getElementById('error').innerHTML = error; });
+
+}
+	
+// ----------------------------------------------------
+  
+</script>
+
+  </body>
+</html>
