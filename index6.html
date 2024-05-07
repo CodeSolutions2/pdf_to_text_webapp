@@ -9,7 +9,7 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- ---------------------------------------- -->
 <!-- View two split window -->
 <div align="left">
-<table style='text-align: left; width: 300px; display:block'>
+<table style='text-align: left; width: 500px; display:block'>
 <tr>
 <td>
 <h3>View PDF</h3>
@@ -64,14 +64,13 @@ div {position: relative; z-index: 0;}
 div#notification {color: #3236a8; }
 div#error {color: #bd1f17; }
 
-table {vertical-align:top; border: 1px solid black; border-collapse: collapse;}
-  
+table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 1px solid black;}
+
 td {vertical-align: top;}
 
 tr {border: 0px solid black; padding: 10px 20px;}
-	
+
 th {border: 1px solid black; padding: 10px 20px;}
-}
 </style>
 
 	  
@@ -133,8 +132,8 @@ async function show_pdf_wo_CORS() {
   	// https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
   	var objectElement = document.createElement('object');
   	objectElement.setAttribute("type", "application/pdf");
-  	objectElement.setAttribute("width", 100);  //800
-  	objectElement.setAttribute("height", 500);  // 1200
+  	objectElement.setAttribute("width", 800);
+  	objectElement.setAttribute("height", 1200);
   
   	// one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
   	objectElement.setAttribute("data", file_download_url_name);
