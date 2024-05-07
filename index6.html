@@ -122,6 +122,8 @@ async function show_pdf_wo_CORS() {
 
   try {
   	// without CORS: name of file
+	console.log("file_download_url: ", file_download_url);
+	  
   	let file_download_url_name = file_download_url.split('/').pop();
   	console.log("file_download_name: ", file_download_url_name);
   
