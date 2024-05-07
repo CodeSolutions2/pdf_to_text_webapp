@@ -36,14 +36,15 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <input id="input_ASSISTANT_ID" type="text" value="" placeholder="ASSISTANT_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <input id="input_THREAD_ID" type="text" value="" placeholder="THREAD_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <input id="input_RUN_ID" type="text" value="" placeholder="RUN_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<br>
+<div id="notification"></div>
+<div id="error"></div>
 </th>
 	
 <!-- ---------------------------------------- -->
 
 <th id="pdf_viewer_output">
 <!-- Text DOM outputs -->
-<div id="notification"></div>
-<div id="error"></div>
 <div id="output_FILE_ID"></div>
 <div id="output_ASSISTANT_ID"></div>
 <div id="output_THREAD_ID"></div>
@@ -60,10 +61,16 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <!-- ---------------------------------------- -->
 <!-- CSS -->
 <style>
-div {position: absolute; top: 0; z-index: 0; padding: 10px; display:block; font-family:courier; font-size:15px; height:300px; }
+div {top: 0; padding: 10px; display:block; font-family:courier; font-size:15px; height:300px; }
 	
-div#notification {color: #3236a8; }
-div#error {color: #bd1f17; }
+div#notification { position: relative; color: #3236a8; }
+div#error { position: relative; color: #bd1f17; }
+	
+div#output_FILE_ID { position: absolute; z-index: 0; }
+div#output_ASSISTANT_ID { position: absolute; z-index: 20; }
+div#output_THREAD_ID { position: absolute; z-index: 40; }
+div#output_THREAD_MESSAGE_ID { position: absolute; z-index: 60; }
+div#output_RUN_ID { position: absolute; z-index: 80; }
 
 table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 0px solid black;}
 
@@ -73,7 +80,7 @@ th, td {vertical-align: top; border: 0px solid black; padding: 10px; }
 th#pdf_viewer_input {width: 100%; }
 th#pdf_viewer_output {width: 100%; }
 
-object#pdf_object_element {vertical-align: top; }
+object#pdf_object_element {position: absolute; vertical-align: top; z-index: 100; }
 </style>
 
 	  
@@ -222,6 +229,8 @@ async function upload_files() {
 			let output = JSON.parse(JSON.stringify(result));
 			FILE_ID = output['id'];
 			out_FILE_ID.innerHTML = FILE_ID;
+			document.getElementById('input_FILE_ID').value = FILE_ID; 
+			document.getElementById('input_FILE_ID').placeholder = FILE_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP A upload_files finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
@@ -270,6 +279,7 @@ async function create_an_assistant() {
 			let output = JSON.parse(JSON.stringify(res));
 			ASSISTANT_ID = output['id'];
 			out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+			document.getElementById('input_ASSISTANT_ID').value = ASSISTANT_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP B create_an_assistant finished." })
 		.catch(error => { document.getElementById('error').innerHTML = error; });
@@ -318,6 +328,7 @@ async function create_a_thread() {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_ID = output['id'];
 			out_THREAD_ID.innerHTML = THREAD_ID;
+			document.getElementById('input_THREAD_ID').value = THREAD_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP C create_a_thread finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
@@ -395,7 +406,8 @@ async function run_the_assistant() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			RUN_ID = output['id'];
-			out_RUN_ID.innerHTML = RUN_ID; 
+			out_RUN_ID.innerHTML = RUN_ID;
+			document.getElementById('input_RUN_ID').value = RUN_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP E run_the_assistant finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
