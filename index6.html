@@ -515,16 +515,14 @@ async function display_the_assistants_response() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			
-			
-			// var model_output = [];
+			document.getElementById('notification').innerHTML = "Assistant Response:";
 			output['data'].forEach(async function(row, index){
-				// console.log("display_the_assistants_response :", output['data'][index]['content'][0]); // OK
-				console.log("display_the_assistants_response :", output['data'][index]['content'][0]['text']);
-			// 	model_output.push(output['data'][index]['content'][0]['text'][0]['value']);
+				let text_output = output['data'][index]['content'][0]['text']['value'];
+				document.getElementById('notification').innerHTML += "\n"+text_output;
 			});
-			// console.log('model_output: ', model_output);
+			
 		})
-		.then(async function() { document.getElementById('notification').innerHTML = "STEP G display_the_assistants_response finished." })
+		.then(async function() { document.getElementById('notification').innerHTML += "\n"+"STEP G display_the_assistants_response finished."; })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 
 }
