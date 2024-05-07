@@ -205,7 +205,11 @@ async function show_pdf_w_CORS() {
 	//   },
 	// };
 	
-	await fetch(file_download_url, options)
+	// await fetch(file_download_url, options)
+	// Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
+
+
+	await proxy1(file_download_url)
 		.then(res => response.blob())
 		.then(async function(blob_object) {
 			// It should be the object
