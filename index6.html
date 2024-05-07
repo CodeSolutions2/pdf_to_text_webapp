@@ -40,32 +40,28 @@ Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutio
 <input id="input_ASSISTANT_ID" type="text" value="" placeholder="ASSISTANT_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <input id="input_THREAD_ID" type="text" value="" placeholder="THREAD_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <input id="input_RUN_ID" type="text" value="" placeholder="RUN_ID" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<!-- Text DOM outputs -->
+<div id="notification" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="error" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_FILE_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_ASSISTANT_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_THREAD_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_THREAD_MESSAGE_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
+<div id="output_RUN_ID" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
 </td>
 </tr>
 </table>
 </div>  
-  
 <!-- ---------------------------------------- -->
-<br>
 
-<!-- Text DOM outputs -->
-<div id="output" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_FILE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_ASSISTANT_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_THREAD_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_THREAD_MESSAGE_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
-<div id="output_RUN_ID" style="display:none;font-family:courier;font-size:24px;height:300px"></div>
 
-<div id="error" style="display:block;font-family:courier;font-size:24px;height:300px"></div>
-
-<!-- --------------------------------------------------- -->
-<!--  {position: absolute; top: 350px;}-->
-	
+<!-- ---------------------------------------- -->
 <!-- CSS -->
 <style>
 div {position: relative; z-index: 0;}
-
-div#error {position: relative; }
+	
+div#notification {color: #3236a8; }
+div#error {color: #bd1f17; }
 
 table {vertical-align:top; border: 0px solid black; border-collapse: collapse;}
   
@@ -75,7 +71,6 @@ tr {border: 0px solid black; padding: 10px 20px;}
 	
 th {border: 1px solid black; padding: 10px 20px;}
 }
-	
 </style>
 
 	  
@@ -182,7 +177,6 @@ async function upload_files() {
 	await fetch(file_download_url)
 		.then(response => response.blob())
 		.then(async function(pdf_blob_object) { 
-			// console.log("pdf_blob_object: ", pdf_blob_object);
 			// return pdf_blob_object; 
 			// OR
 			// Transform blob into a file
@@ -216,9 +210,8 @@ async function upload_files() {
 			let output = JSON.parse(JSON.stringify(result));
 			FILE_ID = output['id'];
 			out_FILE_ID.innerHTML = FILE_ID;
-			console.log("FILE_ID: ", out_FILE_ID.innerHTML);
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP A upload_files finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP A upload_files finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 }
 
@@ -284,9 +277,8 @@ async function create_an_assistant() {
 			let output = JSON.parse(JSON.stringify(res));
 			ASSISTANT_ID = output['id'];
 			out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
-			console.log("ASSISTANT_ID: ", out_ASSISTANT_ID.innerHTML);
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP B create_an_assistant finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP B create_an_assistant finished." })
 		.catch(error => { document.getElementById('error').innerHTML = error; });
   
 }
@@ -333,9 +325,8 @@ async function create_a_thread() {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_ID = output['id'];
 			out_THREAD_ID.innerHTML = THREAD_ID;
-			console.log("THREAD_ID: ", out_THREAD_ID.innerHTML);
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP C create_a_thread finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP C create_a_thread finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 	
 }
@@ -366,9 +357,8 @@ async function add_a_message_to_a_thread() {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_MESSAGE_ID = output['id'];
 			out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
-			console.log("THREAD_MESSAGE_ID: ", out_THREAD_MESSAGE_ID.innerHTML);
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP D add_a_message_to_a_thread finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP D add_a_message_to_a_thread finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 }
 
@@ -411,12 +401,10 @@ async function run_the_assistant() {
 	 	.then(response => response.json())
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
-			// console.log("run_the_assistant: ", output)
 			RUN_ID = output['id'];
-			out_RUN_ID.innerHTML = RUN_ID;
-			console.log("RUN_ID: ", out_RUN_ID.innerHTML); 
+			out_RUN_ID.innerHTML = RUN_ID; 
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP E run_the_assistant finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP E run_the_assistant finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 
 	// Output contains
@@ -472,7 +460,6 @@ async function wait_for_run_to_finish() {
 		.then(async function(out) {  await new Promise(r => setTimeout(r, 5000)); return out; })
 		.then(async function(out) {
 			var run_status = out;
-			// console.log('check_the_run_status: ', out);
 				
 			while (flag == 'wait_for_completion') {
 				if ((run_status.status == "queued" || run_status.status == "in_progress" || run_status.status == "completed") & c < max_allowed_loops) {
@@ -492,7 +479,7 @@ async function wait_for_run_to_finish() {
 			}
 			// console.log(' FINAL: ', run_status.status);
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP F wait_for_run_to_finish finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP F wait_for_run_to_finish finished." })
 		.catch(error => { document.getElementById('error').innerHTML = error; });
 }
   
@@ -526,12 +513,13 @@ async function display_the_assistants_response() {
 			
 			// var model_output = [];
 			output['data'].forEach(async function(row, index){
-				console.log("display_the_assistants_response :", output['data'][index]['content'][0]);
+				// console.log("display_the_assistants_response :", output['data'][index]['content'][0]); // OK
+				console.log("display_the_assistants_response :", output['data'][index]['content'][0]['text']);
 			// 	model_output.push(output['data'][index]['content'][0]['text'][0]['value']);
 			});
 			// console.log('model_output: ', model_output);
 		})
-		.then(async function() { document.getElementById('output').innerHTML = "STEP G display_the_assistants_response finished." })
+		.then(async function() { document.getElementById('notification').innerHTML = "STEP G display_the_assistants_response finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
 
 }
