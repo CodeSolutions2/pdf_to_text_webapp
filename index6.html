@@ -110,10 +110,10 @@ out_RUN_ID.innerHTML = RUN_ID;
 
 // Assign prompt values
 // Step A
-var upload_files_filename = "file_pdf_img.pdf"; 
+var upload_files_filename = "file_pdf_txt.pdf" // "file_pdf_img.pdf"; 
 	
 // Step B
-var create_an_assistant_assistant_name = "pdf_img transcriber";  // pdf transcriber
+var create_an_assistant_assistant_name = "pdf_txt transcriber"; //"pdf_img transcriber";
 var create_an_assistant_description = "You are a helpful PDF document content reading assistant that prints the text content in files.";
 var create_an_assistant_instructions = "You are a helpful PDF document content reading assistant that responds concisely. Read the content of a PDF file and print the content. If the PDF file contains images, use optical character recognition to read the content of the images and print the text. If the PDF file contains encrypted text, decode the encrypted text using base64 decryption. Otherwise, if the PDF file contains readable text, print the text. Format the output concisely with only the response, use the least number of words.";
 	
