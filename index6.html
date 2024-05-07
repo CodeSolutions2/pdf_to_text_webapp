@@ -66,11 +66,11 @@ div { padding: 10px; display:block; font-family:courier; font-size:15px; height:
 div#notification { position: relative; color: #3236a8; }
 div#error { position: relative; color: #bd1f17; }
 	
-div#output_FILE_ID { position: absolute; z-index: 0; }
-div#output_ASSISTANT_ID { position: absolute; z-index: 20; }
-div#output_THREAD_ID { position: absolute; z-index: 40; }
-div#output_THREAD_MESSAGE_ID { position: absolute; z-index: 60; }
-div#output_RUN_ID { position: absolute; z-index: 80; }
+div#output_FILE_ID { display:none; position: absolute; z-index: 0; }
+div#output_ASSISTANT_ID { display:none; position: absolute; z-index: 20; }
+div#output_THREAD_ID { display:none; position: absolute; z-index: 40; }
+div#output_THREAD_MESSAGE_ID { display:none; position: absolute; z-index: 60; }
+div#output_RUN_ID { display:none; position: absolute; z-index: 80; }
 
 table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 0px solid black;}
 
@@ -80,7 +80,7 @@ th, td {vertical-align: top; border: 0px solid black; padding: 10px; }
 th#pdf_viewer_input {width: 100%; }
 th#pdf_viewer_output {width: 100%; }
 
-object#pdf_object_element {position: relative; vertical-align: top; top: 200; z-index: 200; }
+object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-index: 200; }
 </style>
 
 	  
@@ -273,6 +273,7 @@ async function create_an_assistant() {
 			ASSISTANT_ID = output['id'];
 			document.getElementById('output_ASSISTANT_ID').innerHTML = ASSISTANT_ID;
 			document.getElementById('input_ASSISTANT_ID').value = ASSISTANT_ID;
+			document.getElementById('input_ASSISTANT_ID').placeholder = ASSISTANT_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP B create_an_assistant finished." })
 		.catch(error => { document.getElementById('error').innerHTML = error; });
@@ -324,6 +325,7 @@ async function create_a_thread() {
 			THREAD_ID = output['id'];
 			document.getElementById('output_THREAD_ID').innerHTML = THREAD_ID;
 			document.getElementById('input_THREAD_ID').value = THREAD_ID;
+			document.getElementById('input_THREAD_ID').placeholder = THREAD_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP C create_a_thread finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
@@ -408,6 +410,7 @@ async function run_the_assistant() {
 			RUN_ID = output['id'];
 			document.getElementById('output_RUN_ID').innerHTML = RUN_ID;
 			document.getElementById('input_RUN_ID').value = RUN_ID;
+			document.getElementById('input_RUN_ID').placeholder = RUN_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP E run_the_assistant finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
