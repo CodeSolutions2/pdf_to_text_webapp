@@ -13,7 +13,7 @@
 <h1>Extracting text from a pdf</h1>
 Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf).
 <h3>View PDF</h3>
-<input id="pdf_dataset_url" type="text" value="" placeholder="pdf_dataset_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<input id="file_download_url" type="text" value="" placeholder="file_download_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
 <br>
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
 <br>
@@ -80,22 +80,13 @@ th, td {vertical-align: top; border: 0px solid black; padding: 10px; }
 th#pdf_viewer_input {width: 100%; }
 th#pdf_viewer_output {width: 100%; }
 
-object#pdf_object_element {position: absolute; vertical-align: top; z-index: 100; }
+object#pdf_object_element {position: absolute; vertical-align: top; z-index: 300; }
 </style>
 
 	  
 <!-- --------------------------------------------------- -->
 
 <script>
-	
-const out_FILE_ID = document.getElementById('output_FILE_ID');
-const out_ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID');
-const out_THREAD_ID = document.getElementById('output_THREAD_ID');
-const out_THREAD_MESSAGE_ID = document.getElementById('output_THREAD_MESSAGE_ID');
-const out_RUN_ID = document.getElementById('output_RUN_ID');
-
-const file_download_url = document.getElementById("pdf_dataset_url").value;
-const OPENAI_API_KEY = document.getElementById("OPENAI_API_KEY").value;
 
 var FILE_ID = "";
 var ASSISTANT_ID = "";
@@ -103,11 +94,11 @@ var THREAD_ID = "";
 var THREAD_MESSAGE_ID = "";
 var RUN_ID = "";
 
-out_FILE_ID.innerHTML = FILE_ID;
-out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
-out_THREAD_ID.innerHTML = THREAD_ID;
-out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
-out_RUN_ID.innerHTML = RUN_ID;
+document.getElementById('output_FILE_ID').innerHTML = FILE_ID;
+document.getElementById('output_ASSISTANT_ID').innerHTML = ASSISTANT_ID;
+document.getElementById('output_THREAD_ID').innerHTML = THREAD_ID;
+document.getElementById('output_THREAD_MESSAGE_ID').innerHTML = THREAD_MESSAGE_ID;
+document.getElementById('output_RUN_ID').innerHTML = RUN_ID;
 
 
 // Assign prompt values
@@ -134,9 +125,9 @@ async function show_pdf_wo_CORS() {
 
   try {
   	// without CORS: name of file
-	console.log("file_download_url: ", file_download_url);
+	console.log("file_download_url: ", document.getElementById("file_download_url").value);
 	  
-  	let file_download_url_name = file_download_url.split('/').pop();
+  	let file_download_url_name = document.getElementById("file_download_url").value.split('/').pop();
   	console.log("file_download_name: ", file_download_url_name);
   
   	// objectElement works
@@ -193,7 +184,7 @@ async function extract_text_from_pdf_using_OpenAI_assistant() {
 // Step A
 async function upload_files() {
 	
-	await fetch(file_download_url)
+	await fetch(document.getElementById("file_download_url").value)
 		.then(response => response.blob())
 		.then(async function(pdf_blob_object) { 
 			// return pdf_blob_object; 
@@ -206,7 +197,7 @@ async function upload_files() {
 			
 			const url = "https://api.openai.com/v1/files";
 			const headers = new Headers();
-			headers.append("Authorization", 'Bearer ' + OPENAI_API_KEY);
+			headers.append("Authorization", 'Bearer ' + document.getElementById("OPENAI_API_KEY").value);
 			headers.append("Accept", "application/json");
 			const formData = new FormData();
 			if (which_input == 'blob_object') {
@@ -228,7 +219,7 @@ async function upload_files() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			FILE_ID = output['id'];
-			out_FILE_ID.innerHTML = FILE_ID;
+			document.getElementById('output_FILE_ID').innerHTML = FILE_ID;
 			document.getElementById('input_FILE_ID').value = FILE_ID; 
 			document.getElementById('input_FILE_ID').placeholder = FILE_ID;
 		})
@@ -244,10 +235,10 @@ async function create_an_assistant() {
 	// ------------------------------------------
 
 	// Retreive needed variables
-	if (out_FILE_ID.innerHTML == ""){
-		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
+	if (document.getElementById('output_FILE_ID').innerHTML == ""){
+		document.getElementById('output_FILE_ID').innerHTML = document.getElementById("input_FILE_ID").value;
 	}
-	FILE_ID = out_FILE_ID.innerHTML;
+	FILE_ID = document.getElementById('output_FILE_ID').innerHTML;
 
 	// ------------------------------------------
 
@@ -255,7 +246,9 @@ async function create_an_assistant() {
 	
 	var url = 'https://api.openai.com/v1/assistants';
   
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
+	var headers = {"Content-Type": "application/json", 
+		       "Authorization": 'Bearer ' + document.getElementById("OPENAI_API_KEY").value, 
+		       "OpenAI-Beta": 'assistants=v2'}
 
 	var data = {"model": "gpt-4-turbo",
 		    "name": create_an_assistant_assistant_name, 
@@ -278,7 +271,7 @@ async function create_an_assistant() {
 		.then(res => { 
 			let output = JSON.parse(JSON.stringify(res));
 			ASSISTANT_ID = output['id'];
-			out_ASSISTANT_ID.innerHTML = ASSISTANT_ID;
+			document.getElementById('output_ASSISTANT_ID').innerHTML = ASSISTANT_ID;
 			document.getElementById('input_ASSISTANT_ID').value = ASSISTANT_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP B create_an_assistant finished." })
@@ -296,15 +289,17 @@ async function create_a_thread() {
 	// ------------------------------------------
 
 	// Retreive needed variables
-	if (out_FILE_ID.innerHTML == ""){
-		out_FILE_ID.innerHTML = document.getElementById("input_FILE_ID").value;
+	if (document.getElementById('output_FILE_ID').innerHTML == ""){
+		document.getElementById('output_FILE_ID').innerHTML = document.getElementById("input_FILE_ID").value;
 	}
-	FILE_ID = out_FILE_ID.innerHTML;
+	FILE_ID = document.getElementById('output_FILE_ID').innerHTML;
 
 	// ------------------------------------------
 	
 	const url = "https://api.openai.com/v1/threads";
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'}
+	var headers = {"Content-Type": "application/json", 
+		       "Authorization": 'Bearer ' + document.getElementById("OPENAI_API_KEY").value, 
+		       "OpenAI-Beta": 'assistants=v2'}
 
 	// ---------------------------
 
@@ -327,7 +322,7 @@ async function create_a_thread() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_ID = output['id'];
-			out_THREAD_ID.innerHTML = THREAD_ID;
+			document.getElementById('output_THREAD_ID').innerHTML = THREAD_ID;
 			document.getElementById('input_THREAD_ID').value = THREAD_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP C create_a_thread finished." })
@@ -343,15 +338,18 @@ async function add_a_message_to_a_thread() {
 	// ------------------------------------------
 
   // Retreive needed variables
-	if (out_THREAD_ID.innerHTML == ""){
-		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	if (document.getElementById('output_THREAD_ID').innerHTML == ""){
+		document.getElementById('output_THREAD_ID').innerHTML = document.getElementById("input_THREAD_ID").value;
 	}
-	THREAD_ID = out_THREAD_ID.innerHTML;
+	THREAD_ID = document.getElementById('output_THREAD_ID').innerHTML;
 
 	// ------------------------------------------
 	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var headers = {"Content-Type": "application/json", 
+		       "Authorization": 'Bearer ' + document.getElementById("OPENAI_API_KEY").value, 
+		       "OpenAI-Beta": 'assistants=v2'};
+	
 	var data = {"role": "user", "content": add_a_message_to_a_thread_content};
 	var options = {method : 'post', headers: headers, body : JSON.stringify(data)};
 	
@@ -360,7 +358,7 @@ async function add_a_message_to_a_thread() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			THREAD_MESSAGE_ID = output['id'];
-			out_THREAD_MESSAGE_ID.innerHTML = THREAD_MESSAGE_ID;
+			document.getElementById('output_THREAD_MESSAGE_ID').innerHTML = THREAD_MESSAGE_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP D add_a_message_to_a_thread finished." })
 	 	.catch(error => { document.getElementById('error').innerHTML = error; });
@@ -374,16 +372,16 @@ async function run_the_assistant() {
 	// ------------------------------------------
 
 	// Retreive needed variables
-	if (out_THREAD_ID.innerHTML == ""){
-		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	if (document.getElementById('output_THREAD_ID').innerHTML == ""){
+		document.getElementById('output_THREAD_ID').innerHTML = document.getElementById("input_THREAD_ID").value;
 	}
-	THREAD_ID = out_THREAD_ID.innerHTML;
+	THREAD_ID = document.getElementById('output_THREAD_ID').innerHTML;
 
   // Retreive needed variables
-	if (out_ASSISTANT_ID.innerHTML == ""){
-		out_ASSISTANT_ID.innerHTML = document.getElementById("input_ASSISTANT_ID").value;
+	if (document.getElementById('output_ASSISTANT_ID').innerHTML == ""){
+		document.getElementById('output_ASSISTANT_ID').innerHTML = document.getElementById("input_ASSISTANT_ID").value;
 	}
-	ASSISTANT_ID = out_ASSISTANT_ID.innerHTML;
+	ASSISTANT_ID = document.getElementById('output_ASSISTANT_ID').innerHTML;
 
 	// ------------------------------------------
 	
@@ -391,7 +389,9 @@ async function run_the_assistant() {
 	// https://platform.openai.com/docs/api-reference/runs/createRun
 	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs";
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var headers = {"Content-Type": "application/json", 
+		       "Authorization": 'Bearer ' + document.getElementById("OPENAI_API_KEY").value, 
+		       "OpenAI-Beta": 'assistants=v2'};
 
 	// ---------------------------
 	// Run original Assistant instructions
@@ -406,7 +406,7 @@ async function run_the_assistant() {
 	 	.then(async function(result) {
 			let output = JSON.parse(JSON.stringify(result));
 			RUN_ID = output['id'];
-			out_RUN_ID.innerHTML = RUN_ID;
+			document.getElementById('output_RUN_ID').innerHTML = RUN_ID;
 			document.getElementById('input_RUN_ID').value = RUN_ID;
 		})
 		.then(async function() { document.getElementById('notification').innerHTML = "STEP E run_the_assistant finished." })
@@ -426,16 +426,16 @@ async function check_the_run_status() {
 	// ------------------------------------------
 
 	// Retreive needed variables
-	if (out_THREAD_ID.innerHTML == ""){
-		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	if (document.getElementById('output_THREAD_ID').innerHTML == ""){
+		document.getElementById('output_THREAD_ID').innerHTML = document.getElementById("input_THREAD_ID").value;
 	}
-	THREAD_ID = out_THREAD_ID.innerHTML;
+	THREAD_ID = document.getElementById('output_THREAD_ID').innerHTML;
 
 	// Retreive needed variables
-	if (out_RUN_ID.innerHTML == ""){
-		out_RUN_ID.innerHTML = document.getElementById("input_RUN_ID").value;
+	if (document.getElementById('output_RUN_ID').innerHTML == ""){
+		document.getElementById('output_RUN_ID').innerHTML = document.getElementById("input_RUN_ID").value;
 	}
-	RUN_ID = out_RUN_ID.innerHTML;
+	RUN_ID = document.getElementById('output_RUN_ID').innerHTML;
 
 
 	// ------------------------------------------
@@ -444,7 +444,8 @@ async function check_the_run_status() {
 	// GET https://api.openai.com/v1/threads/{thread_id}/runs/{run_id}
 	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/runs/"+RUN_ID;
-	var headers = {"Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var headers = {"Authorization": 'Bearer ' + document.getElementById("OPENAI_API_KEY").value, 
+		       "OpenAI-Beta": 'assistants=v2'};
 	var options = {method : 'GET', headers: headers};
 	
 	return await fetch(url, options)
@@ -498,10 +499,10 @@ async function display_the_assistants_response() {
 	// ------------------------------------------
 
 	// Retreive needed variables
-	if (out_THREAD_ID.innerHTML == ""){
-		out_THREAD_ID.innerHTML = document.getElementById("input_THREAD_ID").value;
+	if (document.getElementById('output_THREAD_ID').innerHTML == ""){
+		document.getElementById('output_THREAD_ID').innerHTML = document.getElementById("input_THREAD_ID").value;
 	}
-	THREAD_ID = out_THREAD_ID.innerHTML;
+	THREAD_ID = document.getElementById('output_THREAD_ID').innerHTML;
 
 	// ------------------------------------------
 	
@@ -509,7 +510,9 @@ async function display_the_assistants_response() {
 	// List messages: GET https://api.openai.com/v1/threads/{thread_id}/messages
 	
 	const url = "https://api.openai.com/v1/threads/"+THREAD_ID+"/messages";
-	var headers = {"Content-Type": "application/json", "Authorization": 'Bearer ' + OPENAI_API_KEY, "OpenAI-Beta": 'assistants=v2'};
+	var headers = {"Content-Type": "application/json", 
+		       "Authorization": 'Bearer ' + document.getElementById("OPENAI_API_KEY").value, 
+		       "OpenAI-Beta": 'assistants=v2'};
 	var options = {method : 'GET', headers: headers};
   
 	await fetch(url, options)
@@ -521,8 +524,9 @@ async function display_the_assistants_response() {
 			document.getElementById('notification').innerHTML += "\n\n";
 			output['data'].forEach(async function(row, index){
 				let text_output = output['data'][index]['content'][0]['text']['value'];
-				document.getElementById('notification').innerHTML += text_output;
-				document.getElementById('notification').innerHTML += "\n\n";
+				if (index == 0) {
+					document.getElementById('notification').innerHTML += text_output;
+				}
 			});
 			
 		})
