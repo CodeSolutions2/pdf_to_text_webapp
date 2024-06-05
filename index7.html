@@ -108,39 +108,24 @@ async function show_pdf_w_CORS() {
 			.then(response => response.blob())
 			.then(async function(blob_object) {
 
-        // Try 0: use the filename equivalent of the blob path
-	// let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
-        // console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
-        // let file_download_url_name = github_url_of_externally_downloaded_data.split('/').pop();
-        // console.log('file_download_url_name: ', file_download_url_name);
-	// await show_pdf_on_page(github_url_of_externally_downloaded_data);
-	// GET https://codesolutions2.github.io/pdf_to_text_webapp/cb347d28-0cda-4ab4-a74b-167b4bff8de7 - 404
-	// 404 means that nothing exists at that URI 404 Not Found
-
-	// Try 1: use the entire blob path
+	// Try 1: use the entire blob path - more correct
 	// let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
         // console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
         // await show_pdf_on_page(github_url_of_externally_downloaded_data);
         // 404 means that nothing exists at that URI
 
-	// Try 2: put the blob directly into the object data field
-	// var objectElement = document.createElement('object');
-  	// objectElement.setAttribute("id", "pdf_object_element");
-  	// objectElement.setAttribute("type", "application/pdf");
-  	// objectElement.setAttribute("width", 800);
-  	// objectElement.setAttribute("height", 1200);
-	// objectElement.setAttribute("data", blob_object);
-  	// document.getElementById('pdf_viewer_output').appendChild(objectElement);
-	// GET https://codesolutions2.github.io/pdf_to_text_webapp/[object%20Blob]
-
 	// Looks like the problem is putting the data on the page
 
 	// Try 3: test if it downloads something
-	console.log('blob_object: ', blob_object)
-	var base64_string = await readFileAsDataURL(blob_object); return base64_string;
+	console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
+	return new File ([blob_object], "file_download", {type: "application/pdf"});
 	})
-	.then(async function(base64_string) {
-		console.log("base64_string: ", base64_string);
+	.then(async function(file_blob_object) {
+		console.log('file_blob_object: ', file_blob_object);
+		
+		let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+		console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+		await show_pdf_on_page(github_url_of_externally_downloaded_data);
 	})
     
 }
