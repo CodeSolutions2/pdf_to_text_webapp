@@ -103,8 +103,10 @@ async function show_pdf_wo_CORS() {
 // Show pdf WITH CORS
 async function show_pdf_w_CORS_fetch_github_repo_file() {
 
-    // Try 3: Download a file blob from the original url
-    await fetch(document.getElementById("file_download_url").value)
+	await read_text_from_pdf();
+	
+	// Try 3: Download a file blob from the original url
+	await fetch(document.getElementById("file_download_url").value)
 			.then(response => response.blob())
 			.then(async function(blob_object) {
 	console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
