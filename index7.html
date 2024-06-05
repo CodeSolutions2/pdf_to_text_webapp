@@ -107,19 +107,30 @@ async function show_pdf_w_CORS() {
     await fetch(document.getElementById("file_download_url").value)
 			.then(response => response.blob())
 			.then(async function(blob_object) {
-				let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
-        console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
 
         // Try 0: use the filename equivalent of the blob path
+	// let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
+        // console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
         // let file_download_url_name = github_url_of_externally_downloaded_data.split('/').pop();
         // console.log('file_download_url_name: ', file_download_url_name);
+	// await show_pdf_on_page(github_url_of_externally_downloaded_data);
 	// GET https://codesolutions2.github.io/pdf_to_text_webapp/cb347d28-0cda-4ab4-a74b-167b4bff8de7 - 404
-	// 404 means that nothing exists at that URI
+	// 404 means that nothing exists at that URI 404 Not Found
 
 	// Try 1: use the entire blob path
+	// let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
+        // console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+        // await show_pdf_on_page(github_url_of_externally_downloaded_data);
+        // 404 means that nothing exists at that URI
 
-        // Use name of blob to show file on page
-        await show_pdf_on_page(github_url_of_externally_downloaded_data);
+	// Try 2: put the blob directly into the object data field
+	var objectElement = document.createElement('object');
+  	objectElement.setAttribute("id", "pdf_object_element");
+  	objectElement.setAttribute("type", "application/pdf");
+  	objectElement.setAttribute("width", 800);
+  	objectElement.setAttribute("height", 1200);
+	objectElement.setAttribute("data", blob_object);
+  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
 	})
     
 }
@@ -129,18 +140,12 @@ async function show_pdf_w_CORS() {
 
 async function show_pdf_on_page(file_download_url_name) {
 
-  // objectElement works
-  	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
-  	// https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
-  	var objectElement = document.createElement('object');
+ 	var objectElement = document.createElement('object');
   	objectElement.setAttribute("id", "pdf_object_element");
   	objectElement.setAttribute("type", "application/pdf");
   	objectElement.setAttribute("width", 800);
   	objectElement.setAttribute("height", 1200);
-  
-  	// one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
-  	objectElement.setAttribute("data", file_download_url_name);
-  	// document.body.appendChild(objectElement);
+	objectElement.setAttribute("data", file_download_url_name);
   	document.getElementById('pdf_viewer_output').appendChild(objectElement);
 }
   
@@ -183,9 +188,11 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 			// let data_decoded = atob(one_match_string);
 			// console.log('data_decoded:', data_decoded);
 
+			// Try 0
 			const charCodes = [777, 610, 500, 277, 389, 250, 443, 500, 500, 333, 500, 443, 500, 777, 443, 500, 277, 250];
 			const text = charCodes.map(code => String.fromCharCode(code)).join('');
 			console.log('text: ', text);
+			// text:  ̉ɢǴĕƅúƻǴǴōǴƻǴ̉ƻǴĕú
 			
 			return str_data;
 		})
