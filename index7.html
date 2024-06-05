@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+
+<h1>Pdf-to-text webapp</h1>
+<ol type="A">
+	<li>Input a .pdf file url. Type in the url to view a pdf (ie: https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf, https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document_imagepdf.pdf).</li>
+	<li>View the extracted text from pdf file.</li>
+	<li>View PDF.</li>
+</ol>
+  
+<!-- ---------------------------------------- -->
+<!-- View two split window -->
+<div align="left">
+<table style='text-align: left; width: 500px; display:block'>
+<tr>
+
+<th id="pdf_viewer_input">
+
+<h3>[Step 0] Input a .pdf file url.</h3>
+<input id="file_download_url" type="text" value="" placeholder="file_download_url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<br>
+<button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
+<br>
+<button id="show_pdf_w_CORS" onclick="show_pdf_w_CORS()">[Step 0] show_pdf_w_CORS</button>
+<br>
+<div id="notification"></div>
+<div id="error"></div>
+<br>
+  
+<h3>[Step 1] View the extracted text from pdf file.</h3>
+<textarea id="selected_text" rows="35" cols="100" placeholder="Selected Text" style="display:block" width:100px; height: 200px;></textarea>
+</th>
+	
+<!-- ---------------------------------------- -->
+
+<th id="pdf_viewer_output">
+<h3>[Step 2] View PDF.</h3>
+</th>
+	
+</tr>
+</table>
+</div>  
+<!-- ---------------------------------------- -->
+
+
+<!-- ---------------------------------------- -->
+<!-- CSS -->
+<style>
+div { padding: 10px; display:block; font-family:courier; font-size:15px; height:300px; }
+	
+div#notification { position: relative; color: #3236a8; }
+div#error { position: relative; color: #bd1f17; }
+
+table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 0px solid black;}
+
+tr {vertical-align: top; border: 0px solid black; padding: 10px 10px; }
+
+th, td {vertical-align: top; border: 0px solid black; padding: 10px; }
+th#pdf_viewer_input {width: 100%; }
+th#pdf_viewer_output {width: 100%; }
+
+object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-index: 200; }
+</style>
+
+	  
+<!-- --------------------------------------------------- -->
+
+<script>
+
+const repoOwner = 'CodeSolutions2';
+const repoName = 'pdf_to_text_webapp';
+
+
+// ----------------------------------------------------
+// Step 0
+// ----------------------------------------------------
+// Show pdf without CORS
+async function show_pdf_wo_CORS() {
+
+  await read_text_from_pdf();
+  
+  try {
+  	// without CORS: name of file
+	console.log("file_download_url: ", document.getElementById("file_download_url").value);
+	  
+  	let file_download_url_name = document.getElementById("file_download_url").value.split('/').pop();
+  	console.log("file_download_name: ", file_download_url_name);
+  
+  	await show_pdf_on_page(file_download_url_name);
+	  
+  } catch (error){
+    document.getElementById("error").innerText = error;
+  }
+  
+}
+
+
+// ----------------------------------------------------
+
+
+// Show pdf WITH CORS
+async function show_pdf_w_CORS() {
+
+    // Try 3: Download a file blob from the original url
+    await fetch(document.getElementById("file_download_url").value)
+			.then(response => response.blob())
+			.then(async function(blob_object) {
+				let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
+        console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+
+        // Need to parse it to get only the file name
+        let file_download_url_name = github_url_of_externally_downloaded_data.split('/').pop();
+        console.log('file_download_url_name: ', file_download_url_name);
+
+        // Use name of blob to show file on page
+        await show_pdf_on_page(file_download_url_name);
+	})
+    
+}
+	
+// ----------------------------------------------------
+
+
+async function show_pdf_on_page(file_download_url_name) {
+
+  // objectElement works
+  	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+  	// https://developer.mozilla.org/en-US/docs/Learn/HTML/Multimedia_and_embedding/Other_embedding_technologies
+  	var objectElement = document.createElement('object');
+  	objectElement.setAttribute("id", "pdf_object_element");
+  	objectElement.setAttribute("type", "application/pdf");
+  	objectElement.setAttribute("width", 800);
+  	objectElement.setAttribute("height", 1200);
+  
+  	// one needs to only put the name of the pdf, instead of the full html_url because the fetch labels the data as cross-site instead of same-site
+  	objectElement.setAttribute("data", file_download_url_name);
+  	// document.body.appendChild(objectElement);
+  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
+}
+  
+  
+	
+
+// ----------------------------------------------------
+// Step 1
+// ----------------------------------------------------
+	
+// Way 0: try reading text from the pdf
+// WORKS
+async function read_text_from_pdf() {
+
+	await GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(document.getElementById("file_download_url").value)
+		.then(async function(text_out) {
+			// console.log('text_out: ', text_out);
+      document.getElementById('selected_text').innerHTML = text_out;
+      
+		});
+
+}
+
+	
+	
+async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download_url) {
+
+	return await fetch(file_download_url)
+		.then(res => res.text())
+		.then(str_data => { 
+			// console.log('str_data: ', str_data); 
+			
+			// try to decode characters from [stream to endstream]
+			// let valstofind = /stream(.*?)endstream/g;
+			// var matches = valstofind.exec(str_data);
+			// console.log('matches: ', matches);
+
+			// var one_match_string = str_data.match(valstofind);
+			// console.log('one_match_string: ', one_match_string);
+			// let data_decoded = atob(one_match_string);
+			// console.log('data_decoded:', data_decoded);
+			
+			return str_data;
+		})
+		.catch(error => { console.log(error); });
+}
+  
+// ----------------------------------------------------
+  
+	
+// ----------------------------------------------------
+
+// ----------------------------------------------------
+
+
+// ----------------------------------------------------
+
+
+  
+// ----------------------------------------------------
+	
+
+
+  
+</script>
+
+  </body>
+</html>
