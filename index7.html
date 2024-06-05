@@ -124,13 +124,23 @@ async function show_pdf_w_CORS() {
         // 404 means that nothing exists at that URI
 
 	// Try 2: put the blob directly into the object data field
-	var objectElement = document.createElement('object');
-  	objectElement.setAttribute("id", "pdf_object_element");
-  	objectElement.setAttribute("type", "application/pdf");
-  	objectElement.setAttribute("width", 800);
-  	objectElement.setAttribute("height", 1200);
-	objectElement.setAttribute("data", blob_object);
-  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
+	// var objectElement = document.createElement('object');
+  	// objectElement.setAttribute("id", "pdf_object_element");
+  	// objectElement.setAttribute("type", "application/pdf");
+  	// objectElement.setAttribute("width", 800);
+  	// objectElement.setAttribute("height", 1200);
+	// objectElement.setAttribute("data", blob_object);
+  	// document.getElementById('pdf_viewer_output').appendChild(objectElement);
+	// GET https://codesolutions2.github.io/pdf_to_text_webapp/[object%20Blob]
+
+	// Looks like the problem is putting the data on the page
+
+	// Try 3: test if it downloads something
+	console.log('blob_object: ', blob_object)
+	var base64_string = await readFileAsDataURL(blob_object); return base64_string;
+	})
+	.then(async function(base64_string) {
+		console.log("base64_string: ", base64_string);
 	})
     
 }
