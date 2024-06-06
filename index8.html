@@ -5,7 +5,7 @@
 
 <h1>Pdf-to-text webapp</h1>
 <ol type="A">
-	<li>Input a .pdf file url. Type in the url to view a pdf 
+	<li>Input a .pdf file url. Type in the url to view a pdf, for example:
 		<ul>
 			<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf</li>
 			<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document_imagepdf.pdf</li>
@@ -190,7 +190,8 @@ async function function2call_the_callback(callback, url) {
     var xmlHttp = new XMLHttpRequest();
 	
     xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        // if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+	if (xmlHttp.status == 200) {
             callback(xmlHttp.responseText);
 	}
     }
