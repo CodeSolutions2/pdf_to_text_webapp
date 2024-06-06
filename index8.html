@@ -155,19 +155,49 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	// 	await show_pdf_on_page(github_url_of_externally_downloaded_data);
 	// })
 
-	// Try 1
-	var xhr = new XMLHttpRequest();
-	xhr.open('GET', document.getElementById("file_download_url").value);
-	xhr.responseType = 'blob';
-	xhr.onload = function (e) {
-		console.log(xhr.response);
-		if (this.status == 200) {
-			var blob_object = this.response;
-			console.log('blob_object: ', blob_object);
-		}
-	};
-	xhr.send();
+	// Try 1 : mal-formed XMLHttpRequest
+	// var xhr = new XMLHttpRequest();
+	// xhr.open('GET', document.getElementById("file_download_url").value);
+	// xhr.responseType = 'blob';
+	// xhr.onload = function (e) {
+	// 	console.log(xhr.response);
+	// 	if (this.status == 200) {
+	// 		var blob_object = this.response;
+	// 		console.log('blob_object: ', blob_object);
+	// 	}
+	// };
+	// xhr.send();
+	// TypeError: NetworkError when attempting to fetch resource.
+
+	// Try 2: what I did before that obtained an XMLHttpRequest response for CORS
+	await function2call_the_callback(function2run_with_callback_return, document.getElementById("file_download_url").value)
+		.then(function(result) { 
+			console.log("result: ", result); 
+		});
     
+}
+
+
+
+async function function2run_with_callback_return(return_output) {
+	console.log('return_output: ', return_output);
+}
+
+	
+async function function2call_the_callback(callback, url) {
+
+    // XMLHttpRequest must return a promise
+    var xmlHttp = new XMLHttpRequest();
+	
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(xmlHttp.responseText);
+	}
+    }
+    xmlHttp.open("GET", url, true); // true for asynchronous 
+    xmlHttp.send(null);
+
+    return xmlHttp;
 }
 	
 // ----------------------------------------------------
