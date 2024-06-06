@@ -141,13 +141,13 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	// Try 0
 	// Problem: I can not even get the blob url because of CORS error
-	// await fetch(document.getElementById("file_download_url").value)
-	// 		.then(response => response.blob())
-	// 		.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
-	// 		.then(async function(blob_object) {
-	// console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
+	await fetch(document.getElementById("file_download_url").value, {method: 'GET', mode: 'cors'})
+	 		.then(response => response.blob())
+	 		.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
+	 		.then(async function(blob_object) {
+	 console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
 	// return new File ([blob_object], "file_download", {type: "application/pdf"});
-	// })
+	})
 	// .then(async function(file_blob_object) {
 	// 	console.log('file_blob_object: ', file_blob_object);
 	// 	let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
@@ -170,10 +170,10 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	// TypeError: NetworkError when attempting to fetch resource.
 
 	// Try 2: what I did before that obtained an XMLHttpRequest response for CORS
-	await function2call_the_callback(function2run_with_callback_return, document.getElementById("file_download_url").value)
-		.then(function(result) { 
-			console.log("result: ", result); 
-		});
+	// await function2call_the_callback(function2run_with_callback_return, document.getElementById("file_download_url").value)
+	// 	.then(function(result) { 
+	//		console.log("result: ", result); 
+	//	});
     
 }
 
