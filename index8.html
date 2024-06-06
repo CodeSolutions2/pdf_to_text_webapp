@@ -23,9 +23,9 @@
 <br>
 <button id="show_pdf_wo_CORS" onclick="show_pdf_wo_CORS()">[Step 0] show_pdf_wo_CORS</button>
 <br>
-<button id="show_pdf_w_CORS_fetch" onclick="show_pdf_w_CORS_fetch()">[Step 0] show_pdf_w_CORS_fetch</button>
+<button id="show_pdf_w_CORS_GithubURL" onclick="show_pdf_w_CORS_GithubURL()">[Step 0] show_pdf_w_CORS_GithubURL</button>
 <br>
-<button id="show_pdf_w_CORS_xhr" onclick="show_pdf_w_CORS_xhr()">[Step 0] show_pdf_w_CORS_xhr</button>
+<button id="show_pdf_w_CORS_nonGithubURL" onclick="show_pdf_w_CORS_nonGithubURL()">[Step 0] show_pdf_w_CORS_nonGithubURL</button>
 <br>
 <div id="notification"></div>
 <div id="error"></div>
@@ -103,20 +103,14 @@ async function show_pdf_wo_CORS() {
 
 
 // Show pdf WITH CORS
-async function show_pdf_w_CORS_fetch() {
+async function show_pdf_w_CORS_GithubURL() {
+
+	await read_text_from_pdf();
 
     // Try 3: Download a file blob from the original url
     await fetch(document.getElementById("file_download_url").value)
 			.then(response => response.blob())
 			.then(async function(blob_object) {
-
-	// Try 1: use the entire blob path - more correct
-	// let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
-        // console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
-        // await show_pdf_on_page(github_url_of_externally_downloaded_data);
-        // 404 means that nothing exists at that URI
-
-	// Looks like the problem is putting the data on the page
 
 	// Try 3: test if it downloads something
 	console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
@@ -135,43 +129,38 @@ async function show_pdf_w_CORS_fetch() {
 // ----------------------------------------------------
 
 // Show pdf WITH CORS
-async function show_pdf_w_CORS_xhr() {
+async function show_pdf_w_CORS_nonGithubURL() {
 
-    // Try 3: Download a file blob from the original url
-    await fetch(document.getElementById("file_download_url").value)
-			.then(response => response.blob())
-			.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
-			.then(async function(blob_objectURL) {
-				var xhr = new XMLHttpRequest();
-				xhr.open('GET', blob_objectURL);
-				xhr.responseType = 'blob';
-				xhr.onload = function (e) {
-				  console.log(xhr.response);
-				  if (this.status == 200) {
-					return this.response;
-				  }
-				};
-				xhr.send();
-			})
-			.then(async function(blob_object) {
-	
-        // console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
-        // await show_pdf_on_page(github_url_of_externally_downloaded_data);
-        // 404 means that nothing exists at that URI
+	await read_text_from_pdf();
 
-	// Looks like the problem is putting the data on the page
+	// Try 0
+	// Problem: I can not even get the blob url because of CORS error
+	// await fetch(document.getElementById("file_download_url").value)
+	// 		.then(response => response.blob())
+	// 		.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
+	// 		.then(async function(blob_object) {
+	// console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
+	// return new File ([blob_object], "file_download", {type: "application/pdf"});
+	// })
+	// .then(async function(file_blob_object) {
+	// 	console.log('file_blob_object: ', file_blob_object);
+	// 	let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+	// 	console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+	// 	await show_pdf_on_page(github_url_of_externally_downloaded_data);
+	// })
 
-	// Try 3: test if it downloads something
-	console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
-	return new File ([blob_object], "file_download", {type: "application/pdf"});
-	})
-	.then(async function(file_blob_object) {
-		console.log('file_blob_object: ', file_blob_object);
-		
-		let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
-		console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
-		await show_pdf_on_page(github_url_of_externally_downloaded_data);
-	})
+	// Try 1
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', document.getElementById("file_download_url").value);
+	xhr.responseType = 'blob';
+	xhr.onload = function (e) {
+		console.log(xhr.response);
+		if (this.status == 200) {
+			var blob_object = this.response;
+			console.log('blob_object: ', blob_object);
+		}
+	};
+	xhr.send();
     
 }
 	
