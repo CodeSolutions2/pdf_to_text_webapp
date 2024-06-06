@@ -190,13 +190,19 @@ async function function2call_the_callback(callback, url) {
     var xmlHttp = new XMLHttpRequest();
 	
     xmlHttp.onreadystatechange = function() { 
-        // if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-	if (xmlHttp.status == 200) {
-            callback(xmlHttp.responseText);
-	}
+	    if (xmlHttp.readyState === XMLHttpRequest.DONE) {
+        	// if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+		if (xmlHttp.status == 200) {
+            		callback(xmlHttp.responseText);
+		}
+	    }
     }
     xmlHttp.open("GET", url, true); // true for asynchronous 
-    xmlHttp.send(null);
+    xmlHttp.withCredentials = true;
+    xmlHttp.timeout = 300;
+    xmlHttp.setRequestHeader('Content-Type', 'application/json');
+	
+    xmlHttp.send(null);  // null means that I send no data
 
     return xmlHttp;
 }
