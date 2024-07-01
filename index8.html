@@ -97,6 +97,12 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script>
 
 
+<script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs">
+import { pdfjsDist } from globalThis;
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
+module.pdfjsDist = pdfjsDist;
+</script>
+	
 <script>
 
 const repoOwner = 'CodeSolutions2';
@@ -201,14 +207,10 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	
 	// Try 3: use pdf.js
-		
-	// The workerSrc property shall be specified
-	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.mjs';
-
-	const getDocument = __webpack_exports__getDocument;
+	const module = {};
 	
 	// Asynchronous download of PDF
-	getDocument(document.getElementById("file_download_url").value)
+	pdfjsLib.getDocument(document.getElementById("file_download_url").value)
 		.then(response => response)
 		.then(async function(pdfDoc) { 
 			console.log("pdfDoc: ", pdfDoc);
