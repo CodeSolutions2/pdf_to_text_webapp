@@ -235,6 +235,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 			} else {
 				args[1] = { headers: { 'Access-Control-Allow-Origin': '*' } };
 			}
+			console.log('args: ', args);
 			return Reflect.apply(target, thisArg, args);
 		}
 	};
@@ -256,7 +257,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	var headers = {"Content-Type": "application/json"};
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
 
-	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler3)
+	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler2)
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
