@@ -175,7 +175,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	await read_text_from_pdf();
 
-	// Try 0
+	// Try 0: download the file from another domain and then save it to the current domain
 	// Problem: I can not even get the blob url because of CORS error
 	// await fetch(document.getElementById("file_download_url").value, {method: 'GET', mode: 'cors'})
 	//  		.then(response => response.blob())
@@ -215,17 +215,34 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	
 	// Try 3: use pdf.js
-	
-	
 	// Asynchronous download of PDF
-	module.pdfjsLib.getDocument(document.getElementById("file_download_url").value)
-		.then(response => response)
-		.then(async function(pdfDoc) { 
-			console.log("pdfDoc: ", pdfDoc);
-			// return pdf_blob_object; 
-		})
-		.catch(error => { console.log(error); });
-    
+	// module.pdfjsLib.getDocument(document.getElementById("file_download_url").value)
+	// 	.then(response => response)
+	// 	.then(async function(pdfDoc) { 
+	// 		console.log("pdfDoc: ", pdfDoc);
+	// 		// return pdf_blob_object; 
+	// 	})
+	// 	.catch(error => { console.log(error); });
+
+
+	// Try 4:
+	const handler2 = {
+		apply: function(target, thisArg, args) {
+			const [url, options] = args;
+			if (options && options.headers) {
+				options.headers['Access-Control-Allow-Origin'] = '*';
+			} else {
+				args[1] = { headers: { 'Access-Control-Allow-Origin': '*' } };
+			}
+			return Reflect.apply(target, thisArg, args);
+		}
+	};
+
+	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value), handler2)
+		.then(response => response.blob())
+		.then(data => console.log('data: ', data))
+		.catch(error => console.error(error));
+	
 }
 
 
