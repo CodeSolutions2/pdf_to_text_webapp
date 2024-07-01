@@ -79,10 +79,10 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 
 <!-- Try 0 -->
 <!-- this loads: https://www.jsdelivr.com/package/npm/pdfjs-dist -->
-<script type="module"> 
-import { pdfjsDist } from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm'
-module.pdfjsDist = pdfjsDist;
-</script>
+<!-- <script type="module"> -->
+<!-- import { pdfjsDist } from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm' -->
+<!-- module.pdfjsDist = pdfjsDist; -->
+<!-- </script> -->
 <!--  OK -->
 
 <!-- Try 1 -->
@@ -92,6 +92,9 @@ module.pdfjsDist = pdfjsDist;
 <!-- Try 2 -->
 <!-- <script type="text/javascript" src="https://unpkg.com/browse/pdfjs-dist@4.2.67"></script> -->
 <!-- The resource from “https://unpkg.com/browse/pdfjs-dist@4.2.67” was blocked due to MIME type (“text/html”) mismatch (X-Content-Type-Options: nosniff). -->
+
+<!-- Try 3 -->
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script>
 
 
 <script>
@@ -198,13 +201,12 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	
 	// Try 3: use pdf.js
-	const module = {};
 		
 	// The workerSrc property shall be specified
-	// pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.mjs';
+	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.mjs';
 	
 	// Asynchronous download of PDF
-	module.pdfjsLib.getDocument(document.getElementById("file_download_url").value)
+	pdfjsLib.getDocument(document.getElementById("file_download_url").value)
 		.then(response => response)
 		.then(async function(pdfDoc) { 
 			console.log("pdfDoc: ", pdfDoc);
