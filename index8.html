@@ -253,7 +253,10 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	  },
 	};
 
-	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value), handler3)
+	var headers = {"Content-Type": "application/json"};
+	var options = {method : 'GET', headers: headers,  mode: 'cors'};
+
+	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler3)
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
