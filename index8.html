@@ -94,13 +94,18 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 <!-- The resource from “https://unpkg.com/browse/pdfjs-dist@4.2.67” was blocked due to MIME type (“text/html”) mismatch (X-Content-Type-Options: nosniff). -->
 
 <!-- Try 3 -->
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script> -->
 
+<!-- Try 4 -->
+<!-- <script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs"> -->
+<!-- import { pdfjsDist } from globalThis; -->
+<!-- pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs'; -->
+<!-- module.pdfjsDist = pdfjsDist; -->
+<!-- </script> -->
 
-<script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs">
-import { pdfjsDist } from globalThis;
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
-module.pdfjsDist = pdfjsDist;
+<!-- Try 5 -->
+<script type="module">
+import * as module from "https://mozilla.github.io/pdf.js/build/pdf.mjs";
 </script>
 	
 <script>
@@ -207,10 +212,10 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	
 	// Try 3: use pdf.js
-	const module = {};
+	//const module = {};
 	
 	// Asynchronous download of PDF
-	pdfjsLib.getDocument(document.getElementById("file_download_url").value)
+	getDocument(document.getElementById("file_download_url").value)
 		.then(response => response)
 		.then(async function(pdfDoc) { 
 			console.log("pdfDoc: ", pdfDoc);
