@@ -97,12 +97,13 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 <!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script> -->
 
 <!-- Try 4 -->
-<script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs"></script>
-<script type="module">
-	import { pdfjsDist } from globalThis;
-	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
-	module.pdfjsDist = pdfjsDist;
-</script>
+<!-- <script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs"></script> -->
+<!-- <script type="module"> -->
+<!-- 	import { pdfjsDist } from globalThis; -->
+<!-- 	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs'; -->
+<!-- 	module.pdfjsDist = pdfjsDist; -->
+<!-- </script> -->
+<!-- missing module specifier after 'from' keyword -->
 
 <!-- Try 5 -->
 <!-- <script type="module"> -->
