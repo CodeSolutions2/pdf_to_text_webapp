@@ -97,17 +97,18 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 <!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script> -->
 
 <!-- Try 4 -->
-<!-- <script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs"> -->
-<!-- import { pdfjsDist } from globalThis; -->
-<!-- pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs'; -->
-<!-- module.pdfjsDist = pdfjsDist; -->
-<!-- </script> -->
-
-<!-- Try 5 -->
+<script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs"></script>
 <script type="module">
-import * as module from "https://mozilla.github.io/pdf.js/build/pdf.mjs";
+	import { pdfjsDist } from globalThis;
+	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs';
+	module.pdfjsDist = pdfjsDist;
 </script>
 
+<!-- Try 5 -->
+<!-- <script type="module"> -->
+<!-- import * as module from "https://mozilla.github.io/pdf.js/build/pdf.mjs"; -->
+<!-- </script> -->
+<!-- Uncaught (in promise) TypeError: module.getDocument is not a function -->
 
 
 <script>
@@ -217,7 +218,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	
 	
 	// Asynchronous download of PDF
-	module.getDocument(document.getElementById("file_download_url").value)
+	module.pdfjsLib.getDocument(document.getElementById("file_download_url").value)
 		.then(response => response)
 		.then(async function(pdfDoc) { 
 			console.log("pdfDoc: ", pdfDoc);
