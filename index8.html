@@ -75,6 +75,25 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 	  
 <!-- --------------------------------------------------- -->
 
+
+
+<!-- Try 0 -->
+<!-- this loads: https://www.jsdelivr.com/package/npm/pdfjs-dist -->
+<script type="module"> 
+import { pdfjsDist } from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm'
+module.pdfjsDist = pdfjsDist;
+</script>
+<!--  OK -->
+
+<!-- Try 1 -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm"></script> -->
+<!-- Uncaught SyntaxError: export declarations may only appear at top level of a module -->
+
+<!-- Try 2 -->
+<!-- <script type="text/javascript" src="https://unpkg.com/browse/pdfjs-dist@4.2.67"></script> -->
+<!-- The resource from “https://unpkg.com/browse/pdfjs-dist@4.2.67” was blocked due to MIME type (“text/html”) mismatch (X-Content-Type-Options: nosniff). -->
+
+
 <script>
 
 const repoOwner = 'CodeSolutions2';
@@ -141,11 +160,11 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	// Try 0
 	// Problem: I can not even get the blob url because of CORS error
-	await fetch(document.getElementById("file_download_url").value, {method: 'GET', mode: 'cors'})
-	 		.then(response => response.blob())
-	 		.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
-	 		.then(async function(blob_object) {
-	 console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
+	// await fetch(document.getElementById("file_download_url").value, {method: 'GET', mode: 'cors'})
+	//  		.then(response => response.blob())
+	//  		.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
+	//  		.then(async function(blob_object) {
+	// console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
 	// return new File ([blob_object], "file_download", {type: "application/pdf"});
 	})
 	// .then(async function(file_blob_object) {
@@ -155,6 +174,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	// 	await show_pdf_on_page(github_url_of_externally_downloaded_data);
 	// })
 
+	
 	// Try 1 : mal-formed XMLHttpRequest
 	// var xhr = new XMLHttpRequest();
 	// xhr.open('GET', document.getElementById("file_download_url").value);
@@ -169,11 +189,30 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	// xhr.send();
 	// TypeError: NetworkError when attempting to fetch resource.
 
+	
 	// Try 2: what I did before that obtained an XMLHttpRequest response for CORS
 	// await function2call_the_callback(function2run_with_callback_return, document.getElementById("file_download_url").value)
 	// 	.then(function(result) { 
 	//		console.log("result: ", result); 
 	//	});
+
+	
+	// Try 3: use pdf.js
+	const module = {};
+		
+	
+	
+	// The workerSrc property shall be specified
+	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.mjs';
+	
+	// Asynchronous download of PDF
+	pdfjsLib.getDocument(url)
+		.then(response => response)
+		.then(async function(pdfDoc) { 
+			console.log("pdfDoc: ", pdfDoc);
+			// return pdf_blob_object; 
+		})
+		.catch(error => { console.log(error); });
     
 }
 
@@ -273,6 +312,9 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 			// Convert UTF-8 array [non-fixed length array] to text
 			var text1 = new TextDecoder().decode(uint8Array_out);
 			console.log('text1: ', text1);
+
+
+			
 			
 			return str_data;
 		})
