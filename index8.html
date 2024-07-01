@@ -206,7 +206,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.worker.mjs';
 	
 	// Asynchronous download of PDF
-	pdfjsLib.getDocument(document.getElementById("file_download_url").value)
+	__webpack_exports__getDocument(document.getElementById("file_download_url").value)
 		.then(response => response)
 		.then(async function(pdfDoc) { 
 			console.log("pdfDoc: ", pdfDoc);
