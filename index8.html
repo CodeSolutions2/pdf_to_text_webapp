@@ -265,6 +265,14 @@ async function GET_text_from_file_wo_auth_GitHub_RESTAPI_directurl(file_download
 			const text = charCodes.map(code => String.fromCharCode(code)).join('');
 			console.log('text: ', text);
 			// text:  ̉ɢǴĕƅúƻǴǴōǴƻǴ̉ƻǴĕú
+
+			// Try 1
+			// const uint8Array_out = new Uint8Array(data_decoded_arrayBuffer);
+			// console.log('uint8Array_out:', uint8Array_out);
+			
+			// Convert UTF-8 array [non-fixed length array] to text
+			var text1 = new TextDecoder().decode(charCodes);
+			console.log('text1: ', text1);
 			
 			return str_data;
 		})
