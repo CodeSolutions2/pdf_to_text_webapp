@@ -288,16 +288,23 @@ async function proxy_call_with_apply_way1() {
 	      return Reflect.apply(target, thisArg, args);
 	    }
 	  };
+	var url = document.getElementById("file_download_url").value;
 	var headers = {"Content-Type": "application/json"};
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
 
 	// What works
 	const proxy3 = new Proxy(fetch, handler);
-	await proxy3(url)
+	// so, one can make a function from a variable if it is a proxy?
+	await proxy3(url, options)
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
-	
+
+	// What I thought it should be, but results in an error
+	// const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler)
+	// 	.then(response => response.blob())
+	// 	.then(data => console.log('data: ', data))
+	// 	.catch(error => console.error(error));
 	// Uncaught (in promise) TypeError: Promise.prototype.then called on incompatible Proxy
 	// Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource. 
 }
