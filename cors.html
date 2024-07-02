@@ -266,19 +266,42 @@ async function proxy_call_with_apply_way0() {
 
 async function proxy_call_with_apply_way1() {
 
-	// const handler = {
-	// 	apply: function(target, thisArg, args) {
-	// 		const [url, options] = args;
-	// 		if (options && options.headers) {
-	// 			options.headers['Access-Control-Allow-Origin'] = '*';
-	// 		} else {
-	// 			args[1] = { headers: { 'Access-Control-Allow-Origin': '*' } };
-	// 		}
-	// 		console.log('args: ', args);
-	// 		return Reflect.apply(target, thisArg, args);
-	// 	}
-	// };
-	
+	const handler = {
+		apply: function(target, thisArg, args) {
+			// One needs to re-define the input arguments of the handler because a constant variable is used as a function (ie: await proxy3(url, options))
+			const [url, options] = args;
+			if (options && options.headers) {
+				options.headers['Access-Control-Allow-Origin'] = '*';
+			} else {
+				args[1] = { headers: { 'Access-Control-Allow-Origin': '*' } };
+	 		}
+	 		console.log('args: ', args);
+	 		return Reflect.apply(target, thisArg, args);
+		}
+	};
+	var url = document.getElementById("file_download_url").value;
+	var headers = {"Content-Type": "application/json"};
+	var options = {method : 'GET', headers: headers,  mode: 'cors'};
+
+	// Call the constant variable proxy3 as a function to resolve the promise correctly
+	const proxy3 = new Proxy(fetch, handler);
+	await proxy3(url, options)
+		.then(response => response.blob())
+		.then(data => console.log('data: ', data))
+		.catch(error => console.error(error));
+
+	// Proxy sturcture works! 
+	// Calls the function WITHOUT input variables to assign a proxy definition to a constant variable. 
+	// The constant variable is called as a function, where it resolves promises. 
+
+	// Need to solve the next error:
+	// (Reason: CORS request did not succeed). Status code: (null).
+	// (Reason: CORS preflight response did not succeed). Status code: 403
+}
+
+
+async function proxy_call_with_apply_way2() {
+
 	const handler = {
 		apply: function(target, thisArg, args) {
 	      // target = fetch
@@ -292,23 +315,19 @@ async function proxy_call_with_apply_way1() {
 	var headers = {"Content-Type": "application/json"};
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
 
-	// What works
-	const proxy3 = new Proxy(fetch, handler);
-	// so, one can make a function from a variable if it is a proxy?
-	await proxy3(url, options)
+	const proxy3 = new Proxy(fetch(url, options), handler)
+	await proxy3()
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
 
-	// What I thought it should be, but results in an error
-	// const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler)
-	// 	.then(response => response.blob())
-	// 	.then(data => console.log('data: ', data))
-	// 	.catch(error => console.error(error));
+	// Calls the function WITH input variables to assign a proxy definition to a constant variable. 
+	// The constant variable is called as a function, where it resolves promises. 
+
+	
 	// Uncaught (in promise) TypeError: Promise.prototype.then called on incompatible Proxy
 	// Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource. 
 }
-
 	
 
 async function proxy_call_with_get_way0() {
@@ -326,12 +345,15 @@ async function proxy_call_with_get_way0() {
 	  },
 	};
 
+	var url = document.getElementById("file_download_url").value;
 	var headers = {"Content-Type": "application/json"};
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
-	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler)
-		.then(response => response.blob())
-		.then(data => console.log('data: ', data))
-		.catch(error => console.error(error));
+	const proxy3 = new Proxy(fetch(url, options), handler)
+		//.then(response => response.blob())
+		//.then(data => console.log('data: ', data))
+		//.catch(error => console.error(error));
+
+	// Trying to call this standard way, without a promise, to see if it works
 
 }
 
