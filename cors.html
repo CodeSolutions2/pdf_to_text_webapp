@@ -37,8 +37,6 @@
 <br>
 <button id="proxy_call_with_apply_way1" onclick="proxy_call_with_apply_way1()">proxy_call_with_apply_way1</button>
 <br>
-<button id="proxy_call_with_apply_way2" onclick="proxy_call_with_apply_way2()">proxy_call_with_apply_way2</button>
-<br>
 <button id="proxy_call_with_get_way0" onclick="proxy_call_with_get_way0()">proxy_call_with_get_way0</button>
 <br>
 	
@@ -185,21 +183,7 @@ async function show_pdf_w_CORS_nonGithubURL() {
 
 	await read_text_from_pdf();
 
-	// Try 0: download the file from another domain and then save it to the current domain
-	// Problem: I can not even get the blob url because of CORS error
-	// await fetch(document.getElementById("file_download_url").value, {method: 'GET', mode: 'cors'})
-	//  		.then(response => response.blob())
-	//  		.then(async function(blob_object) { return URL.createObjectURL(blob_object); })
-	//  		.then(async function(blob_object) {
-	// console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
-	// return new File ([blob_object], "file_download", {type: "application/pdf"});
-	// })
-	// .then(async function(file_blob_object) {
-	// 	console.log('file_blob_object: ', file_blob_object);
-	// 	let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
-	// 	console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
-	// 	await show_pdf_on_page(github_url_of_externally_downloaded_data);
-	// })
+	
 
 	
 	// Try 1 : mal-formed XMLHttpRequest
@@ -237,36 +221,42 @@ async function show_pdf_w_CORS_nonGithubURL() {
 	
 }
 
-async function proxy_call_with_apply_way0() {
+async function regular_fetch() {
+	
+	// Try 0: download the file from another domain and then save it to the current domain
+	// Problem: I can not even get the blob url because of CORS error
 
-	const fetchProxy = new Proxy(fetch, {
-	  apply: function(target, thisArg, args) {
-	    const [url, options] = args;
-	    if (options && options.headers) {
-	      options.headers['Access-Control-Allow-Origin'] = '*';
-	    } else {
-	      args[1] = { headers: { 'Access-Control-Allow-Origin': '*' } };
-	    }
-	    return Reflect.apply(target, thisArg, args);
-	  }
-	});
-	
 	var url = document.getElementById("file_download_url").value;
+	var headers = {"Content-Type": "application/json",
+		      "Connection": "keep-alive"};
 	
-	await fetchProxy(url)
-		.then(response => response.json())
-		.then(data => console.log('data: ', data))
+	var options = {method : 'GET',
+		       mode: 'cors',
+		       cache: "no-cache",
+		       headers: headers,
+		       redirect: "follow"};
+	
+	await fetch(url, options)
+		.then(response => response.blob())
+		.then(async function(blob_object) { 
+			console.log('blob_object: ', blob_object);
+			// return URL.createObjectURL(blob_object); 
+		})
 		.catch(error => console.error(error));
-	// Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf. (Reason: CORS preflight response did not succeed). Status code: 403.
-	
-	// Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf. (Reason: CORS request did not succeed). Status code: (null).
-	
-	// TypeError: NetworkError when attempting to fetch resource.
+	//  		.then(async function(blob_object) {
+	// console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
+	// return new File ([blob_object], "file_download", {type: "application/pdf"});
+	// })
+	// .then(async function(file_blob_object) {
+	// 	console.log('file_blob_object: ', file_blob_object);
+	// 	let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+	// 	console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+	// 	await show_pdf_on_page(github_url_of_externally_downloaded_data);
+	// })
 }
 
 
-
-async function proxy_call_with_apply_way1() {
+async function proxy_call_with_apply_way0() {
 
 	const handler = {
 		apply: function(target, thisArg, args) {
@@ -281,8 +271,14 @@ async function proxy_call_with_apply_way1() {
 				args[1] = { headers: { 'Access-Control-Allow-Origin': '*',
 						     'Access-Control-Allow-Credentials': false,
 						     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-						     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} };
+						     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+						     } };
 	 		}
+
+			// 
+			// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
+
+			
 	 		console.log('args: ', args);
 	 		return Reflect.apply(target, thisArg, args);
 		}
@@ -295,7 +291,10 @@ async function proxy_call_with_apply_way1() {
 	const proxy3 = new Proxy(fetch, handler);
 	await proxy3(url, options)
 		.then(response => response.blob())
-		.then(data => console.log('data: ', data))
+		.then(async function(blob_object) { 
+			console.log('blob_object: ', blob_object);
+			// return URL.createObjectURL(blob_object); 
+		})
 		.catch(error => console.error(error));
 
 	// Proxy sturcture works! 
@@ -305,41 +304,62 @@ async function proxy_call_with_apply_way1() {
 	// Need to solve the next error:
 	// (Reason: CORS request did not succeed). Status code: (null).
 	// (Reason: CORS preflight response did not succeed). Status code: 403
-}
+	// Solution: add more headers that it may be missing - received the same error
 
+	// Response Header
+	// HTTP/2 403 
+	// cache-control: no-cache
+	// content-type: text/html; charset=utf-8
+	// strict-transport-security: max-age=31536000
+	// x-content-type-options: nosniff
+	// x-frame-options: deny
+	// x-xss-protection: 0
+	// content-security-policy: default-src 'none'; style-src 'unsafe-inline'; img-src data:;
+	// accept-ranges: bytes
+	// date: Tue, 02 Jul 2024 10:43:41 GMT
+	// via: 1.1 varnish
+	// x-served-by: cache-par-lfpg1960050-PAR
+	// x-cache: MISS
+	// x-cache-hits: 0
+	// x-timer: S1719917021.126861,VS0,VE9
+	// access-control-allow-origin: *
+	// cross-origin-resource-policy: cross-origin
+	// x-fastly-request-id: 9aa24a414b4381b89251b33b70f7b64573ec8516
+	// expires: Tue, 02 Jul 2024 10:48:41 GMT
+	// vary: Authorization,Accept-Encoding
+	// X-Firefox-Spdy: h2
 
-async function proxy_call_with_apply_way2() {
+	// Request Header
+	// OPTIONS /CodeSolutions2/pdf_to_text_webapp/main/document.pdf HTTP/2
+	// Host: raw.githubusercontent.com
+	// User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0
+	// Accept: */*
+	// Accept-Language: en-US,en;q=0.5
+	// Accept-Encoding: gzip, deflate, br
+	// Access-Control-Request-Method: GET
+	// Access-Control-Request-Headers: content-type
+	// Referer: https://codesolutions2.github.io/
+	// Origin: https://codesolutions2.github.io
+	// DNT: 1
+	// Sec-GPC: 1
+	// Connection: keep-alive
+	// Sec-Fetch-Dest: empty  // audio (<audio>), audioworklet (audioWorklet.addModule(), document, embed, frame, image, object, video)
+	// Sec-Fetch-Mode: cors
+	// Sec-Fetch-Site: cross-site
 
-	const handler = {
-		apply: function(target, thisArg, args) {
-	      // target = fetch
-	      // args = [url, options]
-	      args[1].options.headers['Access-Control-Allow-Origin'] = '*';
-	      console.log('args: ', args);
-	      return Reflect.apply(target, thisArg, args);
-	    }
-	  };
-	var url = document.getElementById("file_download_url").value;
-	var headers = {"Content-Type": "application/json"};
-	var options = {method : 'GET', headers: headers,  mode: 'cors', redirect: "follow"};
-
-	const proxy3 = new Proxy(fetch(url, options), handler)
-	await proxy3()
-		.then(response => response.blob())
-		.then(data => console.log('data: ', data))
-		.catch(error => console.error(error));
-
-	// Calls the function WITH input variables to assign a proxy definition to a constant variable. 
-	// The constant variable is called as a function, where it resolves promises. 
-
+	// Is Sec-Fetch-Dest: empty OK? it means that a specific destination element is not specified because on performs fetch()
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-Fetch-Dest
 	
-	// Uncaught (in promise) TypeError: Promise.prototype.then called on incompatible Proxy
-	// Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource. 
+	// Try to use the set method, maybe the apply function does not set the values
 }
+
+
+
 	
 
 async function proxy_call_with_get_way0() {
-	
+
+	// Add the 'Access-Control-Allow-Origin' using proxy get
 	const handler = {
 		get(target, prop, receiver) {
 			console.log('prop: ', prop);
@@ -349,6 +369,7 @@ async function proxy_call_with_get_way0() {
 		    options_existing.headers['Access-Control-Allow-Origin'] = '*';
 	      return options_existing;
 	    }
+			
 	    return Reflect.get(...arguments);
 	  },
 	};
@@ -361,7 +382,13 @@ async function proxy_call_with_get_way0() {
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
+}
 
+
+async function proxy_call_with_get_way1() {
+
+	// modify client-side parameters: the IP address of the request using proxy get
+	
 
 }
 
