@@ -33,11 +33,13 @@
 <br>
 <button id="show_pdf_w_CORS_nonGithubURL" onclick="show_pdf_w_CORS_nonGithubURL()">[Step 0] show_pdf_w_CORS_nonGithubURL</button>
 <br>
+
+<button id="regular_fetch" onclick="regular_fetch()">regular_fetch</button>
+<br>
 <button id="proxy_call_with_apply_way0" onclick="proxy_call_with_apply_way0()">proxy_call_with_apply_way0</button>
 <br>
-<button id="proxy_call_with_apply_way1" onclick="proxy_call_with_apply_way1()">proxy_call_with_apply_way1</button>
-<br>
 <button id="proxy_call_with_get_way0" onclick="proxy_call_with_get_way0()">proxy_call_with_get_way0</button>
+	
 <br>
 	
 <div id="notification"></div>
@@ -227,14 +229,18 @@ async function regular_fetch() {
 	// Problem: I can not even get the blob url because of CORS error
 
 	var url = document.getElementById("file_download_url").value;
-	var headers = {"Content-Type": "application/json",
-		      "Connection": "keep-alive"};
+	var headers = {
+		"Content-Type": "application/json",
+		"Connection": "keep-alive"
+	};
 	
-	var options = {method : 'GET',
-		       mode: 'cors',
-		       cache: "no-cache",
-		       headers: headers,
-		       redirect: "follow"};
+	var options = {
+		method : 'GET',
+		mode: 'cors',
+		cache: "no-cache",
+		headers: headers,
+		redirect: "follow"
+	};
 	
 	await fetch(url, options)
 		.then(response => response.blob())
@@ -375,22 +381,33 @@ async function proxy_call_with_get_way0() {
 	};
 
 	var url = document.getElementById("file_download_url").value;
-	var headers = {"Content-Type": "application/json"};
-	var options = {method : 'GET', headers: headers,  mode: 'cors', redirect: "follow"};
+	var headers = {
+		"Content-Type": "application/json",
+		"Connection": "keep-alive",
+		"Sec-Fetch-Dest": "document",
+		"Sec-Fetch-Mode": "navigate",
+		"Sec-Fetch-Site": "cross-site",
+		"Sec-Fetch-User": "?1"
+	};
+	var options = {
+		method : 'GET',
+		mode: 'cors',
+		cache: "no-cache",
+		headers: headers,
+		redirect: "follow"
+	};
 	const proxy3 = new Proxy(fetch, handler)
 	await proxy3(url, options)
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
-}
 
 
-async function proxy_call_with_get_way1() {
-
+	// Other ideas to try: 
 	// modify client-side parameters: the IP address of the request using proxy get
-	
-
 }
+
+
 
 
 async function function2run_with_callback_return(return_output) {
