@@ -37,6 +37,9 @@
 <br>
 <button id="proxy_call_with_apply_way1" onclick="proxy_call_with_apply_way1()">proxy_call_with_apply_way1</button>
 <br>
+<button id="proxy_call_with_get_way0" onclick="proxy_call_with_get_way0()">proxy_call_with_get_way0</button>
+<br>
+	
 <div id="notification"></div>
 <div id="error"></div>
 <br>
@@ -252,8 +255,11 @@ async function proxy_call_with_apply_way0() {
 		.then(response => response.json())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
-
+	// Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf. (Reason: CORS preflight response did not succeed). Status code: 403.
 	
+	// Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf. (Reason: CORS request did not succeed). Status code: (null).
+	
+	// TypeError: NetworkError when attempting to fetch resource.
 }
 
 
@@ -284,10 +290,21 @@ async function proxy_call_with_apply_way1() {
 	  };
 	var headers = {"Content-Type": "application/json"};
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
-	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler)
-			.then(response => response.blob())
-			.then(data => console.log('data: ', data))
-			.catch(error => console.error(error));
+
+	// What works
+	// const proxy3 = new Proxy(fetch, handler);
+	// await proxy3(url)
+	// 	.then(response => response.blob())
+	// 	.then(data => console.log('data: ', data))
+	// 	.catch(error => console.error(error));
+
+	// What I did 
+	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options)
+				 .then(response => response.blob())
+				 .then(data => console.log('data: ', data))
+				 .catch(error => console.error(error));
+				 , handler)
+			
 
 	// Uncaught (in promise) TypeError: Promise.prototype.then called on incompatible Proxy
 	// Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource. 
@@ -296,8 +313,8 @@ async function proxy_call_with_apply_way1() {
 	
 
 async function proxy_call_with_get_way0() {
-  // Try 5: use get to obtain 
-	const handler3 = {
+	
+	const handler = {
 		get(target, prop, receiver) {
 			console.log('prop: ', prop);
 			console.log('prop has key options: ', prop === "options");
@@ -312,8 +329,7 @@ async function proxy_call_with_get_way0() {
 
 	var headers = {"Content-Type": "application/json"};
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
-
-	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler2)
+	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options), handler)
 		.then(response => response.blob())
 		.then(data => console.log('data: ', data))
 		.catch(error => console.error(error));
