@@ -361,9 +361,9 @@ async function proxy_call_with_apply_way0() {
 	};
 	var options = {
 		method : 'GET',
-		// mode: 'cors',
-		// cache: "no-cache",
-		'crossorigin': "",
+		mode: 'cors',
+		cache: "no-cache",
+		crossorigin: 'anonymous',
 		headers: headers,
 		redirect: "follow"
 	};
