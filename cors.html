@@ -37,6 +37,8 @@
 <br>
 <button id="proxy_call_with_apply_way1" onclick="proxy_call_with_apply_way1()">proxy_call_with_apply_way1</button>
 <br>
+<button id="proxy_call_with_apply_way2" onclick="proxy_call_with_apply_way2()">proxy_call_with_apply_way2</button>
+<br>
 <button id="proxy_call_with_get_way0" onclick="proxy_call_with_get_way0()">proxy_call_with_get_way0</button>
 <br>
 	
@@ -272,8 +274,14 @@ async function proxy_call_with_apply_way1() {
 			const [url, options] = args;
 			if (options && options.headers) {
 				options.headers['Access-Control-Allow-Origin'] = '*';
+				options.headers['Access-Control-Allow-Credentials'] = false;
+				options.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE';
+				options.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
 			} else {
-				args[1] = { headers: { 'Access-Control-Allow-Origin': '*' } };
+				args[1] = { headers: { 'Access-Control-Allow-Origin': '*',
+						     'Access-Control-Allow-Credentials': false,
+						     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+						     'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'} };
 	 		}
 	 		console.log('args: ', args);
 	 		return Reflect.apply(target, thisArg, args);
@@ -281,7 +289,7 @@ async function proxy_call_with_apply_way1() {
 	};
 	var url = document.getElementById("file_download_url").value;
 	var headers = {"Content-Type": "application/json"};
-	var options = {method : 'GET', headers: headers,  mode: 'cors'};
+	var options = {method : 'GET', headers: headers,  mode: 'cors', redirect: "follow"};
 
 	// Call the constant variable proxy3 as a function to resolve the promise correctly
 	const proxy3 = new Proxy(fetch, handler);
@@ -313,7 +321,7 @@ async function proxy_call_with_apply_way2() {
 	  };
 	var url = document.getElementById("file_download_url").value;
 	var headers = {"Content-Type": "application/json"};
-	var options = {method : 'GET', headers: headers,  mode: 'cors'};
+	var options = {method : 'GET', headers: headers,  mode: 'cors', redirect: "follow"};
 
 	const proxy3 = new Proxy(fetch(url, options), handler)
 	await proxy3()
@@ -347,13 +355,13 @@ async function proxy_call_with_get_way0() {
 
 	var url = document.getElementById("file_download_url").value;
 	var headers = {"Content-Type": "application/json"};
-	var options = {method : 'GET', headers: headers,  mode: 'cors'};
-	const proxy3 = new Proxy(fetch(url, options), handler)
-		//.then(response => response.blob())
-		//.then(data => console.log('data: ', data))
-		//.catch(error => console.error(error));
+	var options = {method : 'GET', headers: headers,  mode: 'cors', redirect: "follow"};
+	const proxy3 = new Proxy(fetch, handler)
+	await proxy3(url, options)
+		.then(response => response.blob())
+		.then(data => console.log('data: ', data))
+		.catch(error => console.error(error));
 
-	// Trying to call this standard way, without a promise, to see if it works
 
 }
 
