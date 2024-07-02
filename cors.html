@@ -37,8 +37,6 @@
 <button id="regular_fetch" onclick="regular_fetch()">regular_fetch</button>
 <br>
 <button id="proxy_call_with_apply_way0" onclick="proxy_call_with_apply_way0()">proxy_call_with_apply_way0</button>
-<br>
-<button id="proxy_call_with_get_way0" onclick="proxy_call_with_get_way0()">proxy_call_with_get_way0</button>
 	
 <br>
 	
@@ -125,6 +123,8 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 
 const repoOwner = 'CodeSolutions2';
 const repoName = 'pdf_to_text_webapp';
+
+	
 const module = {};
 
 // ----------------------------------------------------
@@ -334,8 +334,8 @@ async function proxy_call_with_apply_way0() {
 	var headers = {
 		"Content-Type": "application/json",
 		"Connection": "keep-alive",
-		"Sec-Fetch-Dest": "document",
-		"Sec-Fetch-Mode": "navigate",
+		"Sec-Fetch-Dest": "empty",
+		"Sec-Fetch-Mode": "no-cors",
 		"Sec-Fetch-Site": "cross-site",
 		"Sec-Fetch-User": "?1",
 		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"
@@ -418,82 +418,6 @@ async function proxy_call_with_apply_way0() {
 
 	
 
-async function proxy_call_with_get_way0() {
-
-	// Add the 'Access-Control-Allow-Origin' using proxy get
-	const handler = {
-		get(target, prop, receiver) {
-			console.log('prop: ', prop);
-			console.log('prop has key options: ', prop === "options");
-	    if (prop === "options") {
-		    var options_existing = Object.entries(prop.options);
-		    options_existing.headers['Access-Control-Allow-Origin'] = '*';
-	      return options_existing;
-	    }
-			
-	    return Reflect.get(...arguments);
-	  },
-	};
-
-	var url = document.getElementById("file_download_url").value;
-	var headers = {
-		"Content-Type": "application/json",
-		"Connection": "keep-alive",
-		"Sec-Fetch-Dest": "document",
-		"Sec-Fetch-Mode": "navigate",
-		"Sec-Fetch-Site": "cross-site",
-		"Sec-Fetch-User": "?1",
-		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"
-	};
-	var options = {
-		method : 'GET',
-		mode: 'cors',
-		cache: "no-cache",
-		headers: headers,
-		redirect: "follow"
-	};
-	const proxy3 = new Proxy(fetch, handler)
-	await proxy3(url, options)
-		.then(response => response.blob())
-		.then(data => console.log('data: ', data))
-		.catch(error => console.error(error));
-
-
-	// Other ideas to try: 
-	// modify client-side parameters: the IP address of the request using proxy get
-}
-
-
-
-
-async function function2run_with_callback_return(return_output) {
-	console.log('return_output: ', return_output);
-}
-
-	
-async function function2call_the_callback(callback, url) {
-
-    // XMLHttpRequest must return a promise
-    var xmlHttp = new XMLHttpRequest();
-	
-    xmlHttp.onreadystatechange = function() { 
-	    if (xmlHttp.readyState === XMLHttpRequest.DONE) {
-        	// if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-		if (xmlHttp.status == 200) {
-            		callback(xmlHttp.responseText);
-		}
-	    }
-    }
-    xmlHttp.open("GET", url, true); // true for asynchronous 
-    xmlHttp.withCredentials = true;
-    xmlHttp.timeout = 300;
-    xmlHttp.setRequestHeader('Content-Type', 'application/json');
-	
-    xmlHttp.send(null);  // null means that I send no data
-
-    return xmlHttp;
-}
-	
 // ----------------------------------------------------
 
 
@@ -504,7 +428,7 @@ async function show_pdf_on_page(file_download_url_name) {
   	objectElement.setAttribute("type", "application/pdf");
   	objectElement.setAttribute("width", 800);
   	objectElement.setAttribute("height", 1200);
-    objectElement.setAttribute("data", file_download_url_name);
+  	objectElement.setAttribute("data", file_download_url_name);
   	document.getElementById('pdf_viewer_output').appendChild(objectElement);
 }
   
