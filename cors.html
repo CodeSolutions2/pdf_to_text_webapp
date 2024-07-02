@@ -259,6 +259,45 @@ async function regular_fetch() {
 	// 	console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
 	// 	await show_pdf_on_page(github_url_of_externally_downloaded_data);
 	// })
+
+
+	// Response Header
+	// HTTP/2 404 
+	// server: GitHub.com
+	// content-type: text/html; charset=utf-8
+	// permissions-policy: interest-cohort=()
+	// etag: W/"667dfbb1-239b"
+	// content-security-policy: default-src 'none'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'
+	// content-encoding: gzip
+	// x-github-request-id: 749E:307D28:B3AC0F:B7AC4D:6683C1C0
+	// accept-ranges: bytes
+	// age: 0
+	// date: Tue, 02 Jul 2024 09:00:48 GMT
+	// via: 1.1 varnish
+	// x-served-by: cache-par-lfpg1960046-PAR
+	// x-cache: MISS
+	// x-cache-hits: 0
+	// x-timer: S1719910848.380074,VS0,VE106
+	// vary: Accept-Encoding
+	// x-fastly-request-id: 33e1eda13247e3daff9057c8682c75a6453bdfcb
+	// content-length: 5142
+	// X-Firefox-Spdy: h2
+
+	// Request Header
+	// GET /favicon.ico HTTP/2
+	// Host: codesolutions2.github.io
+	// User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0
+	// Accept: image/avif,image/webp,*/*
+	// Accept-Language: en-US,en;q=0.5
+	// Accept-Encoding: gzip, deflate, br
+	// DNT: 1
+	// Sec-GPC: 1
+	// Connection: keep-alive
+	// Referer: https://codesolutions2.github.io/pdf_to_text_webapp/cors.html
+	// Sec-Fetch-Dest: image
+	// Sec-Fetch-Mode: no-cors
+	// Sec-Fetch-Site: same-origin
+
 }
 
 
@@ -290,8 +329,21 @@ async function proxy_call_with_apply_way0() {
 		}
 	};
 	var url = document.getElementById("file_download_url").value;
-	var headers = {"Content-Type": "application/json"};
-	var options = {method : 'GET', headers: headers,  mode: 'cors', redirect: "follow"};
+	var headers = {
+		"Content-Type": "application/json",
+		"Connection": "keep-alive",
+		"Sec-Fetch-Dest": "document",
+		"Sec-Fetch-Mode": "navigate",
+		"Sec-Fetch-Site": "cross-site",
+		"Sec-Fetch-User": "?1"
+	};
+	var options = {
+		method : 'GET',
+		mode: 'cors',
+		cache: "no-cache",
+		headers: headers,
+		redirect: "follow"
+	};
 
 	// Call the constant variable proxy3 as a function to resolve the promise correctly
 	const proxy3 = new Proxy(fetch, handler);
