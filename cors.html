@@ -347,25 +347,25 @@ async function proxy_call_with_apply_way0() {
 	// 'Cache-Control': 'max-age=0' // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security?utm_source=mozilla&utm_medium=devtools-netmonitor&utm_campaign=default - this allows one to change the preflight request, other wise the preflight request settings are set for a year
 	var headers = {
 		"Content-Type": "application/json",
-		"Referer": document.getElementById("file_download_url").value,
-		"Origin": "https://codesolutions2.github.io",
-		'Cache-Control': 'max-age=0',
-		"Connection": "keep-alive",
-		"Sec-Fetch-Dest": "empty",
-		"Sec-Fetch-Mode": "cors", 
-		"Sec-Fetch-Site": "cross-site",
-		"Sec-Fetch-User": "?1",
-		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
-		"Access-Control-Request-Method": 'GET',
-		"Access-Control-Request-Headers": 'content-type,x-pingother'
+		//"Referer": document.getElementById("file_download_url").value,
+		//"Origin": "https://codesolutions2.github.io",
+		//'Cache-Control': 'max-age=0',
+		//"Connection": "keep-alive",
+		//"Sec-Fetch-Dest": "empty",
+		//"Sec-Fetch-Mode": "cors", 
+		//"Sec-Fetch-Site": "cross-site",
+		//"Sec-Fetch-User": "?1",
+		//"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
+		//"Access-Control-Request-Method": 'GET',
+		//"Access-Control-Request-Headers": 'content-type,x-pingother'
 	};
 	var options = {
-		method : 'GET',
-		mode: 'cors',
-		cache: "no-cache",
+		//method : 'GET',
+		//mode: 'cors',
+		//cache: "no-cache",
 		crossorigin: 'anonymous',
 		headers: headers,
-		redirect: "follow"
+		//redirect: "follow"
 	};
 
 	// Call the constant variable proxy3 as a function to resolve the promise correctly
