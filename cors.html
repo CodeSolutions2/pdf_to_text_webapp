@@ -303,6 +303,9 @@ async function regular_fetch() {
 
 async function proxy_call_with_apply_way0() {
 
+	// Parameters to influence Response Header
+	// The `handler` object defines a `apply` method that intercepts the `fetch` function calls and adds the "Access-Control-Allow-Origin" header with a value of "*" to the request options. The `new Proxy(fetch, handler)` creates a proxied version of the `fetch` function that applies the defined handler.
+	
 	const handler = {
 		apply: function(target, thisArg, args) {
 			// One needs to re-define the input arguments of the handler because a constant variable is used as a function (ie: await proxy3(url, options))
@@ -312,15 +315,13 @@ async function proxy_call_with_apply_way0() {
 				options.headers['Access-Control-Allow-Credentials'] = false;
 				options.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE';
 				options.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
-				options.headers['Port'] = "80";
 			} else {
 				args[1] = {
 					headers: { 
 						'Access-Control-Allow-Origin': '*',
 						'Access-Control-Allow-Credentials': false,
 						'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
-						'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-						'Port': "80"
+						'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
 					}
 				};
 	 		}
@@ -333,17 +334,18 @@ async function proxy_call_with_apply_way0() {
 	var url = document.getElementById("file_download_url").value;
 	var headers = {
 		"Content-Type": "application/json",
-		"Connection": "keep-alive",
-		"Sec-Fetch-Dest": "empty",
-		"Sec-Fetch-Mode": "no-cors",
-		"Sec-Fetch-Site": "cross-site",
-		"Sec-Fetch-User": "?1",
+		"Origin": "https://codesolutions2.github.io",
+		// "Connection": "keep-alive",
+		// "Sec-Fetch-Dest": "empty",
+		// "Sec-Fetch-Mode": "cors",
+		// "Sec-Fetch-Site": "cross-site",
+		// "Sec-Fetch-User": "?1",
 		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"
 	};
 	var options = {
 		method : 'GET',
-		mode: 'cors',
-		cache: "no-cache",
+		// mode: 'cors',
+		// cache: "no-cache",
 		headers: headers,
 		redirect: "follow"
 	};
