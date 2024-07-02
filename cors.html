@@ -292,20 +292,12 @@ async function proxy_call_with_apply_way1() {
 	var options = {method : 'GET', headers: headers,  mode: 'cors'};
 
 	// What works
-	// const proxy3 = new Proxy(fetch, handler);
-	// await proxy3(url)
-	// 	.then(response => response.blob())
-	// 	.then(data => console.log('data: ', data))
-	// 	.catch(error => console.error(error));
-
-	// What I did 
-	const proxy3 = new Proxy(fetch(document.getElementById("file_download_url").value, options)
-				 .then(response => response.blob())
-				 .then(data => console.log('data: ', data))
-				 .catch(error => console.error(error));
-				 , handler)
-			
-
+	const proxy3 = new Proxy(fetch, handler);
+	await proxy3(url)
+		.then(response => response.blob())
+		.then(data => console.log('data: ', data))
+		.catch(error => console.error(error));
+	
 	// Uncaught (in promise) TypeError: Promise.prototype.then called on incompatible Proxy
 	// Uncaught (in promise) TypeError: NetworkError when attempting to fetch resource. 
 }
