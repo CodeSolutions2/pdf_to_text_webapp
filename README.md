@@ -1,5 +1,7 @@
 # pdf_to_text_webapp
 
+View pdf documents from a GitHub repository only. There are two methods for viewing a pdf from a github repository, using the direct url via non-cors fetch and using the a downloaded blob url via a non-cors fetch. 
+
 [Completed working version] https://CodeSolutions2.github.io/pdf_to_text_webapp/index7.html
 
 
