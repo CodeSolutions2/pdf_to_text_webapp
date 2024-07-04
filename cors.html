@@ -83,49 +83,33 @@ object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-
 <!-- --------------------------------------------------- -->
 
 
-
-<!-- Try 0 -->
-<!-- this loads: https://www.jsdelivr.com/package/npm/pdfjs-dist -->
-<!-- <script type="module"> -->
-<!-- import { pdfjsDist } from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm' -->
-<!-- module.pdfjsDist = pdfjsDist; -->
-<!-- </script> -->
-<!--  OK -->
-
-<!-- Try 1 -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.1.392/+esm"></script> -->
-<!-- Uncaught SyntaxError: export declarations may only appear at top level of a module -->
-
-<!-- Try 2 -->
-<!-- <script type="text/javascript" src="https://unpkg.com/browse/pdfjs-dist@4.2.67"></script> -->
-<!-- The resource from “https://unpkg.com/browse/pdfjs-dist@4.2.67” was blocked due to MIME type (“text/html”) mismatch (X-Content-Type-Options: nosniff). -->
-
-<!-- Try 3 -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.3.136/build/pdf.mjs"></script> -->
-
-<!-- Try 4 -->
-<!-- <script type="module" src="https://mozilla.github.io/pdf.js/build/pdf.mjs"></script> -->
-<!-- <script type="module"> -->
-<!-- 	import { pdfjsDist } from globalThis; -->
-<!-- 	pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://mozilla.github.io/pdf.js/build/pdf.worker.mjs'; -->
-<!-- 	module.pdfjsDist = pdfjsDist; -->
-<!-- </script> -->
-<!-- missing module specifier after 'from' keyword -->
-
-<!-- Try 5 -->
-<!-- <script type="module"> -->
-<!-- import * as module from "https://mozilla.github.io/pdf.js/build/pdf.mjs"; -->
-<!-- </script> -->
-<!-- Uncaught (in promise) TypeError: module.getDocument is not a function -->
-
-
 <script>
 
 const repoOwner = 'CodeSolutions2';
 const repoName = 'pdf_to_text_webapp';
 
+
+let target = "https://codesolutions2.github.io/frontend_backend_message_passing_central_repository_v1/index_reset.html";
+function function_to_run_when_true(e) {
+	// Returns requestHeaders
+	for (const header of e.requestHeaders) {
+		if (header.name.toLowerCase() === "user-agent") { header.value = "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"; }
+		if (header.name.toLowerCase() === "access-control-allow-origin") { header.value = '*'; }
+		if (header.name.toLowerCase() === "access-control-allow-credentials") { header.value = false; }
+		if (header.name.toLowerCase() === "access-control-allow-methods") { header.value = 'GET, POST'; }
+		if (header.name.toLowerCase() === "access-control-allow-headers") { header.value = 'Content-Type, Authorization'; }
+		if (header.name.toLowerCase() === "access-control-max-age") { header.value = 0; }
+	}
 	
-const module = {};
+	return { requestHeaders: e.requestHeaders };
+}
+	
+browser.webRequest.onBeforeSendHeaders.addListener(
+	function_to_run_when_true, 
+	{ urls: [document.getElementById("file_download_url").value] },
+	["blocking", "requestHeaders"]
+);
+	
 
 // ----------------------------------------------------
 // Step 0
