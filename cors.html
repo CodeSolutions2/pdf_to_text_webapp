@@ -202,7 +202,8 @@ async function regular_fetch() {
 		method : 'GET',
 		mode: 'cors',
 		cache: "no-cache",
-		crossorigin: 'anonymous',
+		//crossorigin: 'anonymous',
+		crossorigin: '*',
 		headers: new Headers(headers),
 		redirect: "follow"
 	};
@@ -331,7 +332,8 @@ async function proxy_call_with_apply_way0() {
 		mode: 'cors',
 		cache: "no-cache",
 		credentials: 'include',
-		crossorigin: 'anonymous',
+		//crossorigin: 'anonymous',
+		crossorigin: '*',
 		headers: new Headers(headers),
 		redirect: "follow"
 	};
