@@ -199,9 +199,9 @@ async function regular_fetch() {
 		"Access-Control-Allow-Origin": "*",
 	};
 	var options = {
-		//method : 'GET',
-		//mode: 'cors',
-		//cache: "no-cache",
+		method : 'GET',
+		mode: 'cors',
+		cache: "no-cache",
 		crossorigin: 'anonymous',
 		headers: new Headers(headers),
 		redirect: "follow"
@@ -327,10 +327,10 @@ async function proxy_call_with_apply_way0() {
 		//'Cache-Control': 'max-age=0',
 	};
 	var options = {
-		//method : 'GET',
-		//mode: 'cors',
-		//cache: "no-cache",
-		//credentials: 'include',
+		method : 'GET',
+		mode: 'cors',
+		cache: "no-cache",
+		credentials: 'include',
 		crossorigin: 'anonymous',
 		headers: new Headers(headers),
 		redirect: "follow"
