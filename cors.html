@@ -89,26 +89,6 @@ const repoOwner = 'CodeSolutions2';
 const repoName = 'pdf_to_text_webapp';
 
 
-let target = "https://codesolutions2.github.io/frontend_backend_message_passing_central_repository_v1/index_reset.html";
-function function_to_run_when_true(e) {
-	// Returns requestHeaders
-	for (const header of e.requestHeaders) {
-		if (header.name.toLowerCase() === "user-agent") { header.value = "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"; }
-		if (header.name.toLowerCase() === "access-control-allow-origin") { header.value = '*'; }
-		if (header.name.toLowerCase() === "access-control-allow-credentials") { header.value = false; }
-		if (header.name.toLowerCase() === "access-control-allow-methods") { header.value = 'GET, POST'; }
-		if (header.name.toLowerCase() === "access-control-allow-headers") { header.value = 'Content-Type, Authorization'; }
-		if (header.name.toLowerCase() === "access-control-max-age") { header.value = 0; }
-	}
-	
-	return { requestHeaders: e.requestHeaders };
-}
-	
-browser.webRequest.onBeforeSendHeaders.addListener(
-	function_to_run_when_true, 
-	{ urls: [document.getElementById("file_download_url").value] },
-	["blocking", "requestHeaders"]
-);
 	
 
 // ----------------------------------------------------
@@ -215,14 +195,15 @@ async function regular_fetch() {
 	var url = document.getElementById("file_download_url").value;
 	var headers = {
 		"Content-Type": "application/json",
-		"Connection": "keep-alive"
+		"Connection": "keep-alive",
+		"Access-Control-Allow-Origin": "*",
 	};
 	
 	var options = {
 		method : 'GET',
 		mode: 'cors',
 		cache: "no-cache",
-		headers: headers,
+		headers: new Headers(headers),
 		redirect: "follow"
 	};
 	
