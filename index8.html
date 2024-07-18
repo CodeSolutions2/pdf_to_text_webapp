@@ -79,7 +79,7 @@ async function display_pdf() {
 		// same domain: use non-cors
 		try {
 			await fetch_nonCORS(url);
-			document.getElementById('notification').innerHTML = 'fetch_nonCORS succeeded';
+			document.getElementById('notification').innerHTML = 'fetch_nonCORS finished';
 		} catch (error) {
 			document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
 		}
@@ -162,7 +162,7 @@ async function fetch_CORS(url) {
 
 	// --------------------------------
 	
-	document.getElementById('notification').innerHTML = 'fetch_CORS succeeded';
+	document.getElementById('notification').innerHTML = 'fetch_CORS finished';
 
 	// --------------------------------
 }
@@ -270,7 +270,7 @@ async function jQuery_CORS(url) {
 
 	// --------------------------------
 	
-	document.getElementById('notification').innerHTML = 'jQuery_CORS succeeded';
+	document.getElementById('notification').innerHTML = 'jQuery_CORS finished';
 
 	// --------------------------------
 }
@@ -300,6 +300,7 @@ async function fetch_nonCORS(url) {
 				
 				await display_adapted_for_browser(github_url_of_externally_downloaded_data);
 			})
+			.catch(function(error) { document.getElementById('error').innerHTML = error; });
 	} catch (error) {
 		document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
 	}
