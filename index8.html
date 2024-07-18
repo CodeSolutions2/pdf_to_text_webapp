@@ -9,6 +9,7 @@
 	<ul>
 		<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf</li>
 		<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document_imagepdf.pdf</li>
+		<!-- <li>https://s3-us-west-2.amazonaws.com/openai-assets/research-covers/language-unsupervised/language_understanding_paper.pdf</li> -->
 	</ul>
 	<li>View PDF.</li>
 </ol>
@@ -319,13 +320,10 @@ async function show_pdf_wo_nonCORS_way1(url) {
 
 async function display_adapted_for_browser(github_url_of_externally_downloaded_data) {
 	
-	const isFireFox = (/firefox/g).test(window.navigator.userAgent);
+	const isFireFox = (/firefox/i).test(window.navigator.userAgent);
 	console.log("isFireFox: ", isFireFox);
-
-	const isFireFox2 = (/firefox/g).test(navigator.userAgent);
-	console.log("isFireFox2: ", isFireFox2);
 	
-	const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+	const isChrome = (/chrome/i).test(window.navigator.userAgent) && (/google inc/i).test(window.navigator.vendor);
 	console.log("isChrome: ", isChrome);
 	
 	if (isChrome) {
