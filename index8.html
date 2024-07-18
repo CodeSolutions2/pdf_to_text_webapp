@@ -18,23 +18,14 @@
 <!-- View two split window -->
 <div align="left">
 <table>
-<tr>
-
-<th scope="col" id="pdf_viewer_input"><h3>[Step A] Input a .pdf file url.</h3>
-<input id="url" type="text" value="" placeholder="url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
-<br>
-<button id="display_pdf" onclick="display_pdf()">Display PDF</button>
-<br>
-<div id="notification"></div>
-<div id="error"></div>
-<br>
-</th>
-	
-<!-- ---------------------------------------- -->
-
-<th scope="col" id="pdf_viewer_output"><h3>[Step B] View PDF.</h3></th>
-	
-</tr>
+	<tr>
+		<th scope="col" id="pdf_viewer_input">[Step A] Input a .pdf file url.</th>
+		<th scope="col" id="pdf_viewer_output">[Step B] View PDF.</th>
+	</tr>
+	<tr>
+		<td><input id="url" type="text" value="" placeholder="url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;"><br><button id="display_pdf" onclick="display_pdf()">Display PDF</button><br><div id="notification"></div><div id="error"></div></td>
+		<td><div id="pdf_display"></div></td>
+	</tr>
 </table>
 </div>  
 <!-- ---------------------------------------- -->
@@ -358,7 +349,7 @@ async function show_pdf_on_page_objectElement(github_url_of_externally_downloade
   	objectElement.setAttribute("width", 800);
   	objectElement.setAttribute("height", 1200);
   	objectElement.setAttribute("data", github_url_of_externally_downloaded_data);
-  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
+  	document.getElementById('pdf_display').appendChild(objectElement);
 }
   
 // ----------------------------------------------------
@@ -371,7 +362,7 @@ async function show_pdf_on_page_iframeElement(github_url_of_externally_downloade
   	iframeElement.setAttribute("width", 800);
   	iframeElement.setAttribute("height", 1200);
   	iframeElement.setAttribute("src", github_url_of_externally_downloaded_data);
-  	document.getElementById('pdf_viewer_output').appendChild(iframeElement);
+  	document.getElementById('pdf_display').appendChild(iframeElement);
 }
 	
 // ----------------------------------------------------
@@ -384,7 +375,7 @@ async function show_pdf_on_page_embedElement(github_url_of_externally_downloaded
   	embedElement.setAttribute("width", 800);
   	embedElement.setAttribute("height", 1200);
   	embedElement.setAttribute("src", github_url_of_externally_downloaded_data);
-  	document.getElementById('pdf_viewer_output').appendChild(embedElement);
+  	document.getElementById('pdf_display').appendChild(embedElement);
 }
 
 // ----------------------------------------------------
