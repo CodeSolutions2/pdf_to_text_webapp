@@ -159,7 +159,7 @@ async function fetch_CORS(url) {
 			let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
 			console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
           
-			await display_adapted_for_browser(file_download_url_name);
+			await display_adapted_for_browser(github_url_of_externally_downloaded_data);
 
 			// a file was loaded before, so remove the blob URL from memory to use resources effectively
 			// URL.revokeObjectURL(github_url_of_externally_downloaded_data);
