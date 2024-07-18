@@ -335,8 +335,8 @@ async function display_adapted_for_browser(github_url_of_externally_downloaded_d
 		document.getElementById('notification').innerHTML += 'Using embedElement.';
 		await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
 		// OR
-		document.getElementById('notification').innerHTML += 'Using iframeElement.';
-		await show_pdf_on_page_iframeElement(github_url_of_externally_downloaded_data);
+		// document.getElementById('notification').innerHTML += 'Using iframeElement.';
+		// await show_pdf_on_page_iframeElement(github_url_of_externally_downloaded_data);
 	
 	} else {
 		if (isFireFox) {
@@ -364,7 +364,7 @@ async function show_pdf_on_page_objectElement(github_url_of_externally_downloade
 	  	objectElement.setAttribute("data", github_url_of_externally_downloaded_data);
 	  	document.getElementById('pdf_display').appendChild(objectElement);
 	} catch (error) {
-			document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
+		document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
 	}
 }
   
