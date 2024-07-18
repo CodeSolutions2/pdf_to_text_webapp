@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+
+<h1>Pdf-to-text webapp</h1>
+<ol type="A">
+	<li>Input a .pdf file url. Type in the url to view a pdf.
+	<ul>
+		<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf</li>
+		<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document_imagepdf.pdf</li>
+	</ul>
+	<li>View PDF.</li>
+</ol>
+  
+<!-- ---------------------------------------- -->
+<!-- View two split window -->
+<div align="left">
+<table style='text-align: left; width: 500px; display:block'>
+<tr>
+
+<th id="pdf_viewer_input">
+
+<h3>[Step 0] Input a .pdf file url.</h3>
+<input id="url" type="text" value="" placeholder="url" rows="10" cols="100" style="display:block; text-align: left; width: 600px;">
+<br>
+<button id="display_pdf" onclick="display_pdf()">[Step 0] Display PDF</button>
+<br>
+<div id="notification"></div>
+<div id="error"></div>
+<br>
+</th>
+	
+<!-- ---------------------------------------- -->
+
+<th id="pdf_viewer_output">
+<h3>[Step 1] View PDF.</h3>
+</th>
+	
+</tr>
+</table>
+</div>  
+<!-- ---------------------------------------- -->
+
+
+<!-- ---------------------------------------- -->
+<!-- CSS -->
+<style>
+div { padding: 10px; display:block; font-family:courier; font-size:15px; height:300px; }
+	
+div#notification { position: relative; color: #3236a8; }
+div#error { position: relative; color: #bd1f17; }
+
+table {vertical-align: top; border-collapse: collapse; position: relative; z-index: 0; border: 0px solid black;}
+
+tr {vertical-align: top; border: 0px solid black; padding: 30px 30px; }
+
+th, td {vertical-align: top; border: 0px solid black; padding: 10px; }
+th#pdf_viewer_input {width: 100%; }
+th#pdf_viewer_output {width: 100%; }
+
+object#pdf_object_element {position: absolute; vertical-align: top; top: 200; z-index: 200; }
+embed#pdf_embed_element {position: absolute; vertical-align: top; top: 200; z-index: 200; }
+iframe#pdf_iframe_element {position: absolute; vertical-align: top; top: 200; z-index: 200; }
+</style>
+
+<!-- --------------------------------------------------- -->
+
+<script>
+
+// -----------------------------------------------
+	
+window.addEventListener('beforeunload', function() {
+    window.location.href = window.location.href + '?nocache=' + new Date().getTime();
+});
+	
+// -----------------------------------------------
+
+const repoOwner = 'CodeSolutions2';
+const repoName = 'pdf_to_text_webapp';
+
+  
+// ----------------------------------------------------
+
+async function display_pdf() {
+  
+  const url = document.getElementById("url").value;
+  
+  // Determine if the pdf is same domain or different domain
+  if ((/github/g).test(url) == true) {
+    // same domain: use non-cors
+    await show_pdf_wo_nonCORS_way1(url);
+    
+  } else {
+    // different domain: use cors or jsonp
+
+    try {
+      await fetch_CORS(url);
+    } catch (error) {
+      console('fetch_CORS failed to GET pdf: ', error);
+      try {
+        await jQuery_CORS(url);
+      } catch (error) {
+        console('jQuery_CORS failed to GET pdf: ', error);
+      }
+    }
+
+  }
+}
+
+
+// ----------------------------------------------------
+// CORS methods
+// ----------------------------------------------------
+async function fetch_CORS(url) {
+
+	// url: url address
+
+	// --------------------------------
+
+	// Determine request method
+	var headers = {
+		"Content-Type": "application/json",
+		"Referer": url,
+		"Origin": "https://codesolutions2.github.io",
+		"Connection": "keep-alive",
+		//"Sec-Fetch-Dest": "empty",
+		//"Sec-Fetch-Mode": "cors", 
+		//"Sec-Fetch-Site": "cross-site",
+		//"Sec-Fetch-User": "?1",
+		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
+		"Access-Control-Allow-Origin": "*",
+		//'Access-Control-Allow-Credentials': false, 
+		//"Access-Control-Request-Method": method,
+		//"Access-Control-Request-Headers": 'content-type,x-pingother',
+		//'Cache-Control': 'max-age=0',
+	};
+	
+	var options = { 
+		method : 'GET',
+		mode: 'cors',
+		headers: new Headers(headers),
+		cache: "no-cache",
+		// crossorigin: 'anonymous',
+		crossorigin: '*',
+		redirect: "follow"
+	};
+
+	// --------------------------------
+
+  const proxy3 = await define_proxy_handler();
+  
+  await proxy3(url, options)
+				.then(response => response.blob())
+				.then(async function(blob_object) { 
+					console.log('blob_object: ', blob_object);
+					return new File ([blob_object], "file_download", {type: "application/pdf"});
+				})
+				.then(async function(file_blob_object) {
+					console.log('file_blob_object: ', file_blob_object);
+					let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+					console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+          
+					await display_adapted_for_browser(file_download_url_name);
+
+					// a file was loaded before, so remove the blob URL from memory to use resources effectively
+					// URL.revokeObjectURL(github_url_of_externally_downloaded_data);
+					await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
+				})
+				.catch(error => console.error("error: ", error));
+
+  // --------------------------------
+
+}
+
+// ----------------------------------------------------
+
+async function define_proxy_handler() {
+	// Parameters to influence Response Header
+	// The `handler` object defines a `apply` method that intercepts the `fetch` function calls and adds the "Access-Control-Allow-Origin" header with a value of "*" to the request options. The `new Proxy(fetch, handler)` creates a proxied version of the `fetch` function that applies the defined handler.
+	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
+	const handler = {
+		apply: function(target, thisArg, args) {
+			// One needs to re-define the input arguments of the handler because a constant variable is used as a function (ie: await proxy3(url, options))
+			const [url, options] = args;
+			if (options && options.headers) {
+				options.headers['Access-Control-Allow-Origin'] = '*';
+				options.headers['Access-Control-Allow-Credentials'] = false;
+				options.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE';
+				// options.headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
+				options.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
+				options.headers['Access-Control-Max-Age'] = 0;
+			} else {
+				args[1] = {
+					headers: { 
+						'Access-Control-Allow-Origin': '*',
+						'Access-Control-Allow-Credentials': false,
+						'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE',
+						'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+						'Access-Control-Max-Age': 0
+					}
+				};
+			}
+			// console.log('args: ', args);
+			return Reflect.apply(target, thisArg, args);
+		}
+	};
+
+	// Proxy sturcture works! 
+	// Calls the function WITHOUT input variables to assign a proxy definition to a constant variable. 
+	// The constant variable is called as a function, where it resolves promises. 
+	// Call the constant variable proxy3 as a function to resolve the promise correctly
+	return await new Proxy(fetch, handler);
+}
+
+// ----------------------------------------------------
+  
+async function jQuery_CORS(url) {
+
+	// https://api.jquery.com/jQuery.ajax/
+	
+	// url: url address
+
+	var headers = {
+		"Accept": "application/json",
+		"Referer": url,
+		"Origin": "https://codesolutions2.github.io",
+		"Connection": "keep-alive",
+		//"Sec-Fetch-Dest": "empty",
+		//"Sec-Fetch-Mode": "cors", 
+		//"Sec-Fetch-Site": "cross-site",
+		//"Sec-Fetch-User": "?1",
+		"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0",
+		"Access-Control-Allow-Origin": "*",
+		//'Access-Control-Allow-Credentials': false, 
+		//"Access-Control-Request-Method": method,
+		//"Access-Control-Request-Headers": 'content-type,x-pingother',
+		//'Cache-Control': 'max-age=0',
+	};
+	
+	var settings = {
+		type : 'GET',
+		dataType: 'binary', // data type response format: 'xml', html, script, json, jsonp, text, binary
+		async: true,
+		crossDomain: true,
+		beforeSend: function(xhr) {xhr.withCredentials = true;},
+		// headers: new Headers(headers),
+    xhrFields = {responseType: 'blob'},
+		success: function(response) { console.log('Success'); },
+		error: function(xhr, status, error) { console.log('Error:', error); }
+	};
+
+	// --------------------------------
+
+  var jquery_blob = await $.ajax(url, [,settings]).done(function(response) { console.log('response: ', response); return response; });
+
+  // Convert the jquery_blob to a string
+  var text_pdf = jquery_blob.toString();
+  console.log('text_pdf: ', text_pdf);
+		
+		var blob_object = new Blob([text_pdf], {type:"application/pdf"});
+  // OR
+		// var blob_object = new Blob([text_pdf], { type: 'application/octet-stream' });
+		console.log('blob_object: ', blob_object);
+		
+		// var file_blob_object = new File ([blob_object], "file_download", {type: "application/pdf"});
+		// console.log('file_blob_object: ', file_blob_object);
+		// let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+		let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
+		console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+		
+		await display_adapted_for_browser(github_url_of_externally_downloaded_data);
+	
+		// a file was loaded before, so remove the blob URL from memory to use resources effectively
+		await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
+		
+}
+  
+
+// ----------------------------------------------------
+
+
+  
+// ----------------------------------------------------
+// non-CORS methods
+// ----------------------------------------------------
+async function show_pdf_wo_nonCORS_way0(url) {
+  
+  try {
+  	let file_download_url_name = url.split('/').pop();
+  	console.log("file_download_url_name: ", file_download_url_name);
+  	await display_adapted_for_browser(file_download_url_name);
+    
+  } catch (error){
+    document.getElementById("error").innerText = error;
+  }
+  
+}
+
+// ----------------------------------------------------
+
+async function show_pdf_wo_nonCORS_way1(url) {
+	
+	// Try 3: Download a file blob from the original url
+	await fetch(url)
+			.then(response => response.blob())
+			.then(async function(blob_object) {
+        console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
+        return new File ([blob_object], "file_download", {type: "application/pdf"});
+      })
+    .then(async function(file_blob_object) {
+      console.log('file_blob_object: ', file_blob_object);
+      
+      let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+      console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+      
+      await display_adapted_for_browser(github_url_of_externally_downloaded_data);
+    })
+    
+}
+
+// ----------------------------------------------------
+
+async function display_adapted_for_browser(github_url_of_externally_downloaded_data) {
+
+  const isFireFox = () : boolean => (/firefox/i).test(window.navigator.userAgent);
+  const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  
+  if (isChrome) {
+      console.log("This is a Chrome browser");
+    // embedElement
+    await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
+    
+  } else {
+    if (isFireFox) {
+      console.log("This is a Firefox browser");
+      // objectElement
+      await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
+      
+    } else {
+      console.log("This is not a Chrome or Firefox browser");
+      // Default method: objectElement
+      await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
+    }
+  }
+
+}
+  
+// ----------------------------------------------------
+
+
+
+
+// ----------------------------------------------------
+// Ways to display a pdf
+// ----------------------------------------------------
+async function show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data) {
+
+  	var objectElement = document.createElement('object');
+  	objectElement.setAttribute("id", "pdf_object_element");
+  	objectElement.setAttribute("type", "application/pdf");
+  	objectElement.setAttribute("width", 800);
+  	objectElement.setAttribute("height", 1200);
+  	objectElement.setAttribute("data", github_url_of_externally_downloaded_data);
+  	document.getElementById('pdf_viewer_output').appendChild(objectElement);
+}
+  
+// ----------------------------------------------------
+
+async function show_pdf_on_page_iframeElement(github_url_of_externally_downloaded_data) {
+
+  	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+  	var iframeElement = document.createElement('iframe');
+  	iframeElement.setAttribute("id", "pdf_iframe_element");
+  	iframeElement.setAttribute("type", "application/pdf");
+  	iframeElement.setAttribute("width", 800);
+  	iframeElement.setAttribute("height", 1200);
+  	iframeElement.setAttribute("src", github_url_of_externally_downloaded_data);
+  	document.getElementById('pdf_viewer_output').appendChild(iframeElement);
+}
+	
+// ----------------------------------------------------
+
+async function show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data) {
+
+  	var embedElement = document.createElement('embed');
+  	embedElement.setAttribute("id", "pdf_embed_element");
+  	embedElement.setAttribute("type", "application/pdf");
+  	embedElement.setAttribute("width", 800);
+  	embedElement.setAttribute("height", 1200);
+  	embedElement.setAttribute("src", github_url_of_externally_downloaded_data);
+  	document.getElementById('pdf_viewer_output').appendChild(embedElement);
+}
+
+// ----------------------------------------------------
+
+
+  
+</script>
+
+  </body>
+</html>
