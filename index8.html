@@ -83,29 +83,27 @@ const repoName = 'pdf_to_text_webapp';
 // ----------------------------------------------------
 
 async function display_pdf() {
+	
+	const url = document.getElementById("url").value;
   
-  const url = document.getElementById("url").value;
-  
-  // Determine if the pdf is same domain or different domain
-  if ((/github/g).test(url) == true) {
-    // same domain: use non-cors
-    await show_pdf_wo_nonCORS_way1(url);
-    
-  } else {
-    // different domain: use cors or jsonp
-
-    try {
-      await fetch_CORS(url);
-    } catch (error) {
-      console('fetch_CORS failed to GET pdf: ', error);
-      try {
-        await jQuery_CORS(url);
-      } catch (error) {
-        console('jQuery_CORS failed to GET pdf: ', error);
-      }
-    }
-
-  }
+	// Determine if the pdf is same domain or different domain
+	if ((/github/g).test(url) == true) {
+		// same domain: use non-cors
+		await show_pdf_wo_nonCORS_way1(url);
+		
+	} else {
+		// different domain: use cors or jsonp
+		try {
+			await fetch_CORS(url);
+		} catch (error) {
+			console('fetch_CORS failed to GET pdf: ', error);
+			try {
+				await jQuery_CORS(url);
+			} catch (error) {
+				console('jQuery_CORS failed to GET pdf: ', error);
+			}
+		}
+	}
 }
 
 
@@ -169,7 +167,7 @@ async function fetch_CORS(url) {
 		})
 		.catch(error => console.error("error: ", error));
 
-  // --------------------------------
+	// --------------------------------
 
 }
 
@@ -284,16 +282,15 @@ async function jQuery_CORS(url) {
 // non-CORS methods
 // ----------------------------------------------------
 async function show_pdf_wo_nonCORS_way0(url) {
-  
-  try {
-  	let file_download_url_name = url.split('/').pop();
-  	console.log("file_download_url_name: ", file_download_url_name);
-  	await display_adapted_for_browser(file_download_url_name);
-    
-  } catch (error){
-    document.getElementById("error").innerText = error;
-  }
-  
+	
+	try {
+		let file_download_url_name = url.split('/').pop();
+		console.log("file_download_url_name: ", file_download_url_name);
+		await display_adapted_for_browser(file_download_url_name);
+		
+	} catch (error){
+		document.getElementById("error").innerText = error;
+	}
 }
 
 // ----------------------------------------------------
@@ -304,45 +301,49 @@ async function show_pdf_wo_nonCORS_way1(url) {
 	await fetch(url)
 			.then(response => response.blob())
 			.then(async function(blob_object) {
-        console.log('blob_object: ', blob_object);  // blob {size: 8925, type: "application/octet-stream"}
-        return new File ([blob_object], "file_download", {type: "application/pdf"});
-      })
-    .then(async function(file_blob_object) {
-      console.log('file_blob_object: ', file_blob_object);
-      
-      let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
-      console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
-      
-      await display_adapted_for_browser(github_url_of_externally_downloaded_data);
-    })
+				console.log('blob_object: ', blob_object);
+				return new File ([blob_object], "file_download", {type: "application/pdf"});
+			})
+		.then(async function(file_blob_object) {
+			console.log('file_blob_object: ', file_blob_object);
+			
+			let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+			console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+			
+			await display_adapted_for_browser(github_url_of_externally_downloaded_data);
+		})
     
 }
 
 // ----------------------------------------------------
 
 async function display_adapted_for_browser(github_url_of_externally_downloaded_data) {
+	
+	const isFireFox = (/firefox/g).test(window.navigator.userAgent);
+	console.log("isFireFox: ", isFireFox);
 
-  const isFireFox = (/firefox/g).test(window.navigator.userAgent);
-  const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-  
-  if (isChrome) {
-      console.log("This is a Chrome browser");
-    // embedElement
-    await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
-    
-  } else {
-    if (isFireFox) {
-      console.log("This is a Firefox browser");
-      // objectElement
-      await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
-      
-    } else {
-      console.log("This is not a Chrome or Firefox browser");
-      // Default method: objectElement
-      await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
-    }
-  }
-
+	const isFireFox2 = (/firefox/g).test(navigator.userAgent);
+	console.log("isFireFox2: ", isFireFox2);
+	
+	const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+	console.log("isChrome: ", isChrome);
+	
+	if (isChrome) {
+		console.log("This is a Chrome browser");
+		// embedElement
+		await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
+	
+	} else {
+		if (isFireFox) {
+			console.log("This is a Firefox browser");
+			// objectElement
+			await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
+		} else {
+			console.log("This is not a Chrome or Firefox browser");
+			// Default method: objectElement
+			await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
+		}
+	}
 }
   
 // ----------------------------------------------------
@@ -367,8 +368,7 @@ async function show_pdf_on_page_objectElement(github_url_of_externally_downloade
 // ----------------------------------------------------
 
 async function show_pdf_on_page_iframeElement(github_url_of_externally_downloaded_data) {
-
-  	// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+	
   	var iframeElement = document.createElement('iframe');
   	iframeElement.setAttribute("id", "pdf_iframe_element");
   	iframeElement.setAttribute("type", "application/pdf");
