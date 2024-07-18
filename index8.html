@@ -77,7 +77,12 @@ async function display_pdf() {
 	// Determine if the pdf is same domain or different domain
 	if ((/github/g).test(url) == true) {
 		// same domain: use non-cors
-		await fetch_nonCORS(url);
+		try {
+			await fetch_nonCORS(url);
+			document.getElementById('notification').innerHTML = 'fetch_nonCORS succeeded';
+		} catch (error) {
+			document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
+		}
 		
 	} else {
 		// different domain: use cors
@@ -299,11 +304,6 @@ async function fetch_nonCORS(url) {
 		document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
 	}
 
-	// --------------------------------
-	
-	document.getElementById('notification').innerHTML = 'fetch_nonCORS succeeded';
-
-	// --------------------------------
 }
 
 // ----------------------------------------------------
