@@ -322,7 +322,7 @@ async function show_pdf_wo_nonCORS_way1(url) {
 
 async function display_adapted_for_browser(github_url_of_externally_downloaded_data) {
 
-  const isFireFox = () : boolean => (/firefox/i).test(window.navigator.userAgent);
+  const isFireFox = (/firefox/g).test(window.navigator.userAgent);
   const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
   
   if (isChrome) {
