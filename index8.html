@@ -329,8 +329,11 @@ async function display_adapted_for_browser(github_url_of_externally_downloaded_d
 	if (isChrome) {
 		document.getElementById('notification').innerHTML += 'This is a Chrome browser.';
 		
-		// document.getElementById('notification').innerHTML += 'Using embedElement.';
-		// await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
+		document.getElementById('notification').innerHTML += 'Using objectElement.';
+		await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
+		// OR
+		document.getElementById('notification').innerHTML += 'Using embedElement.';
+		await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
 		// OR
 		document.getElementById('notification').innerHTML += 'Using iframeElement.';
 		await show_pdf_on_page_iframeElement(github_url_of_externally_downloaded_data);
