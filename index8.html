@@ -79,7 +79,7 @@ async function display_pdf() {
 		// same domain: use non-cors
 		try {
 			await fetch_nonCORS(url);
-			document.getElementById('notification').innerHTML = 'fetch_nonCORS finished';
+			document.getElementById('notification').innerHTML += 'fetch_nonCORS finished';
 		} catch (error) {
 			document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
 		}
@@ -163,7 +163,7 @@ async function fetch_CORS(url) {
 
 	// --------------------------------
 	
-	document.getElementById('notification').innerHTML = 'fetch_CORS finished';
+	document.getElementById('notification').innerHTML += 'fetch_CORS finished';
 
 	// --------------------------------
 }
@@ -271,7 +271,7 @@ async function jQuery_CORS(url) {
 
 	// --------------------------------
 	
-	document.getElementById('notification').innerHTML = 'jQuery_CORS finished';
+	document.getElementById('notification').innerHTML += 'jQuery_CORS finished';
 
 	// --------------------------------
 }
@@ -327,18 +327,18 @@ async function display_adapted_for_browser(github_url_of_externally_downloaded_d
 	// console.log("isChrome: ", isChrome);
 	
 	if (isChrome) {
-		document.getElementById('notification').innerHTML = 'This is a Chrome browser';
-		// embedElement
+		document.getElementById('notification').innerHTML += 'This is a Chrome browser.';
+		document.getElementById('notification').innerHTML += 'Using embedElement.';
 		await show_pdf_on_page_embedElement(github_url_of_externally_downloaded_data);
 	
 	} else {
 		if (isFireFox) {
-			document.getElementById('notification').innerHTML = 'This is a Firefox browser';
-			// objectElement
+			document.getElementById('notification').innerHTML += 'This is a Firefox browser.';
+			document.getElementById('notification').innerHTML += 'Using objectElement.';
 			await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
 		} else {
-			document.getElementById('notification').innerHTML = 'This is not a Chrome or Firefox browser';
-			// Default method: objectElement
+			document.getElementById('notification').innerHTML += 'This is not a Chrome or Firefox browser.';
+			document.getElementById('notification').innerHTML += 'Using objectElement.';
 			await show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data);
 		}
 	}
