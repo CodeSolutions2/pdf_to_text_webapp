@@ -347,13 +347,17 @@ async function display_adapted_for_browser(github_url_of_externally_downloaded_d
 
 async function show_pdf_on_page_objectElement(github_url_of_externally_downloaded_data) {
 
-  	var objectElement = document.createElement('object');
-  	objectElement.setAttribute("id", "pdf_object_element");
-  	objectElement.setAttribute("type", "application/pdf");
-  	objectElement.setAttribute("width", 800);
-  	objectElement.setAttribute("height", 1200);
-  	objectElement.setAttribute("data", github_url_of_externally_downloaded_data);
-  	document.getElementById('pdf_display').appendChild(objectElement);
+	try {
+	  	var objectElement = document.createElement('object');
+	  	objectElement.setAttribute("id", "pdf_object_element");
+	  	objectElement.setAttribute("type", "application/pdf");
+	  	objectElement.setAttribute("width", 800);
+	  	objectElement.setAttribute("height", 1200);
+	  	objectElement.setAttribute("data", github_url_of_externally_downloaded_data);
+	  	document.getElementById('pdf_display').appendChild(objectElement);
+	} catch (error) {
+			document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
+		}
 }
   
 // ----------------------------------------------------
