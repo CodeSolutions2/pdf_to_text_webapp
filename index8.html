@@ -153,7 +153,7 @@ async function fetch_CORS(url) {
 			// URL.revokeObjectURL(github_url_of_externally_downloaded_data);
 			await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
 		})
-		.catch(error => document.getElementById('error').innerHTML = error;);
+		.catch(function(error) { document.getElementById('error').innerHTML = error; });
 
 	// --------------------------------
 	
