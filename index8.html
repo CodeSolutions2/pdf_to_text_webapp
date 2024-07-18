@@ -98,7 +98,8 @@ async function display_pdf() {
 		}
 	}
 
-	document.getElementById('notification').innerHTML += console.log;
+	document.getElementById('notification').innerHTML += console.warn;
+	document.getElementById('error').innerHTML += console.error;
 }
 
 
