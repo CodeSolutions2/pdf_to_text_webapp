@@ -287,11 +287,11 @@ async function fetch_nonCORS(url) {
 	
 	try {
 		await fetch(url)
-				.then(response => response.blob())
-				.then(async function(blob_object) {
-					// console.log('blob_object: ', blob_object);
-					return new File ([blob_object], "file_download", {type: "application/pdf"});
-				})
+			.then(response => response.blob())
+			.then(async function(blob_object) {
+				console.log('blob_object: ', blob_object);
+				return new File ([blob_object], "file_download", {type: "application/pdf"});
+			})
 			.then(async function(file_blob_object) {
 				// console.log('file_blob_object: ', file_blob_object);
 				
@@ -357,7 +357,7 @@ async function show_pdf_on_page_objectElement(github_url_of_externally_downloade
 	  	document.getElementById('pdf_display').appendChild(objectElement);
 	} catch (error) {
 			document.getElementById('error').innerHTML = 'Check if pdf url is typed in correctly. ' + error;
-		}
+	}
 }
   
 // ----------------------------------------------------
