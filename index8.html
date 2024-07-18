@@ -97,6 +97,8 @@ async function display_pdf() {
 			}
 		}
 	}
+
+	document.getElementById('notification').innerHTML += console.log;
 }
 
 
@@ -144,7 +146,7 @@ async function fetch_CORS(url) {
 	await proxy3(url, options)
 		.then(response => response.blob())
 		.then(async function(blob_object) {
-			console.log('blob_object: ', blob_object);
+			// console.log('blob_object: ', blob_object);
 			return new File ([blob_object], "file_download", {type: "application/pdf"});
 		})
 		.then(async function(file_blob_object) {
@@ -289,7 +291,7 @@ async function fetch_nonCORS(url) {
 		await fetch(url)
 			.then(response => response.blob())
 			.then(async function(blob_object) {
-				console.log('blob_object: ', blob_object);
+				// console.log('blob_object: ', blob_object);
 				return new File ([blob_object], "file_download", {type: "application/pdf"});
 			})
 			.then(async function(file_blob_object) {
