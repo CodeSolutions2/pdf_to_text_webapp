@@ -148,26 +148,26 @@ async function fetch_CORS(url) {
 
 	// --------------------------------
 
-  const proxy3 = await define_proxy_handler();
+	const proxy3 = await define_proxy_handler();
   
-  await proxy3(url, options)
-				.then(response => response.blob())
-				.then(async function(blob_object) { 
-					console.log('blob_object: ', blob_object);
-					return new File ([blob_object], "file_download", {type: "application/pdf"});
-				})
-				.then(async function(file_blob_object) {
-					console.log('file_blob_object: ', file_blob_object);
-					let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
-					console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+	await proxy3(url, options)
+		.then(response => response.blob())
+		.then(async function(blob_object) {
+			console.log('blob_object: ', blob_object);
+			return new File ([blob_object], "file_download", {type: "application/pdf"});
+		})
+		.then(async function(file_blob_object) {
+			console.log('file_blob_object: ', file_blob_object);
+			let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+			console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
           
-					await display_adapted_for_browser(file_download_url_name);
+			await display_adapted_for_browser(file_download_url_name);
 
-					// a file was loaded before, so remove the blob URL from memory to use resources effectively
-					// URL.revokeObjectURL(github_url_of_externally_downloaded_data);
-					await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
-				})
-				.catch(error => console.error("error: ", error));
+			// a file was loaded before, so remove the blob URL from memory to use resources effectively
+			// URL.revokeObjectURL(github_url_of_externally_downloaded_data);
+			await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
+		})
+		.catch(error => console.error("error: ", error));
 
   // --------------------------------
 
@@ -245,35 +245,34 @@ async function jQuery_CORS(url) {
 		crossDomain: true,
 		beforeSend: function(xhr) {xhr.withCredentials = true;},
 		// headers: new Headers(headers),
-    xhrFields = {responseType: 'blob'},
+		xhrFields: {responseType: 'blob'},
 		success: function(response) { console.log('Success'); },
 		error: function(xhr, status, error) { console.log('Error:', error); }
 	};
 
 	// --------------------------------
 
-  var jquery_blob = await $.ajax(url, [,settings]).done(function(response) { console.log('response: ', response); return response; });
+	var jquery_blob = await $.ajax(url, [,settings]).done(function(response) { console.log('response: ', response); return response; });
 
-  // Convert the jquery_blob to a string
-  var text_pdf = jquery_blob.toString();
-  console.log('text_pdf: ', text_pdf);
+	// Convert the jquery_blob to a string
+	var text_pdf = jquery_blob.toString();
+	console.log('text_pdf: ', text_pdf);
 		
-		var blob_object = new Blob([text_pdf], {type:"application/pdf"});
-  // OR
-		// var blob_object = new Blob([text_pdf], { type: 'application/octet-stream' });
-		console.log('blob_object: ', blob_object);
+	var blob_object = new Blob([text_pdf], {type:"application/pdf"});
+	// OR
+	// var blob_object = new Blob([text_pdf], { type: 'application/octet-stream' });
+	console.log('blob_object: ', blob_object);
 		
-		// var file_blob_object = new File ([blob_object], "file_download", {type: "application/pdf"});
-		// console.log('file_blob_object: ', file_blob_object);
-		// let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
-		let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
-		console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
+	// var file_blob_object = new File ([blob_object], "file_download", {type: "application/pdf"});
+	// console.log('file_blob_object: ', file_blob_object);
+	// let github_url_of_externally_downloaded_data = URL.createObjectURL(file_blob_object);
+	let github_url_of_externally_downloaded_data = URL.createObjectURL(blob_object);
+	console.log('github_url_of_externally_downloaded_data: ', github_url_of_externally_downloaded_data);
 		
-		await display_adapted_for_browser(github_url_of_externally_downloaded_data);
+	await display_adapted_for_browser(github_url_of_externally_downloaded_data);
 	
-		// a file was loaded before, so remove the blob URL from memory to use resources effectively
-		await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
-		
+	// a file was loaded before, so remove the blob URL from memory to use resources effectively
+	await setTimeout(function() { URL.revokeObjectURL(github_url_of_externally_downloaded_data); }, 200);
 }
   
 
