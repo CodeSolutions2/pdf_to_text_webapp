@@ -5,7 +5,7 @@
 
 <h1>Url-to-pdf display webapp</h1>
 <ol type="A">
-	<li>Input a .pdf file url. Type in the url to view a pdf.
+	<li>Input a .pdf file url. Copy-paste a url to view a pdf, ensure the url is correct by testing it in the browser. The webapp can not display url errors.
 	<ul>
 		<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document.pdf</li>
 		<li>https://raw.githubusercontent.com/CodeSolutions2/pdf_to_text_webapp/main/document_imagepdf.pdf</li>
@@ -98,8 +98,6 @@ async function display_pdf() {
 		}
 	}
 
-	document.getElementById('notification').innerHTML += console.warn;
-	document.getElementById('error').innerHTML += console.error;
 }
 
 
