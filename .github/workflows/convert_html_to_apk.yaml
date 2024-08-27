@@ -21,7 +21,7 @@ jobs:
           cache: 'npm'
         
       - name: Step 2 - use the html to apk conversion
-        uses: actions/web-to-app-action@main
+        uses: actions/web-to-app-action@latest
         with:
           build-folder-path: "./src_apks" # Defaults to build, It is the folder where build files or html are stored
           app-name: "Url-to-pdf viewer"
