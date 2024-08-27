@@ -32,7 +32,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: 'npm'
         
       - name: Step 2 - use the html to apk conversion - darkshredder/web-to-app-action
         run: |
